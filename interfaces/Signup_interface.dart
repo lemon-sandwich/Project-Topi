@@ -20,7 +20,9 @@ class _Signup_interfaceState extends State<Signup_interface> {
   final _rePassFill = GlobalKey<FormState>();
   final _fullNameFill = GlobalKey<FormState>();
   final _phoneNumberFill = GlobalKey<FormState>();
+  final databaseReference = FirebaseDatabase.instance.reference();
   FirebaseAuth _auth = FirebaseAuth.instance;
+  User _user;
   List<String> _days = ['1'];
   var _currentDay = DateTime.now().day.toString();
   List<String> _months;
@@ -55,6 +57,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
     else if(day > currentDay)
       return (currentYear - year - 1).toString();
     return (currentYear - year).toString();
+
   }
 
   @override
@@ -404,7 +407,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                             elevation: 7,
                             child: InkWell(
 
-                              onTap: () {
+                              onTap: (){
                                 if (_emailFill.currentState.validate() &&
                                     _passwordFill.currentState.validate() && _rePassFill.currentState.validate()
                                 && _phoneNumberFill.currentState.validate() && _fullNameFill.currentState.validate()) {
@@ -442,15 +445,14 @@ class _Signup_interfaceState extends State<Signup_interface> {
     );
   }
 
-  void saveInfo() {
+  void saveInfo() async{
     String name = _fullName.text;
     String email = _email.text;
     String password = _password.text;
-    String dob = _currentDay + '|' + _currentMonth + '|' + _currentYear;
+    String dob = _currentDay + ' ' + _currentMonth + ',' + _currentYear;
     String bloodType = currentbgrp;
     String age = age_calculator(int.parse(_currentDay),_monthMap[_currentMonth],int.parse(_currentYear));
     String phoneNumber = _phoneNumber.text;
-
     Map<String, String> info = {
       'Name': name,
       'Email': email,
