@@ -3,7 +3,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/interfaces/Home_page.dart';
-import 'package:flutter_app/interfaces/Loading_Screen.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'interfaces/Signup_interface.dart';
 import 'services/facebooklogin.dart';
