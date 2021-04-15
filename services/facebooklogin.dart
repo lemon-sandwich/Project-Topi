@@ -6,6 +6,8 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 
+import '../main.dart';
+
 class LoginWithFacebook extends StatefulWidget {
   @override
   _LoginWithFacebookState createState() => _LoginWithFacebookState();
@@ -17,6 +19,8 @@ class _LoginWithFacebookState extends State<LoginWithFacebook> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   FacebookLogin _facebookLogin = FacebookLogin();
   User _user;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
