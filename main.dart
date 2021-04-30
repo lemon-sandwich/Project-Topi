@@ -2,6 +2,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/interfaces/Forgot_Password.dart';
 import 'package:flutter_app/interfaces/Home_page.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'interfaces/Signup_interface.dart';
@@ -45,6 +46,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     final _emailFill = GlobalKey<FormState>();
     final _passwordFill = GlobalKey<FormState>();
+    String error;
     return Scaffold(
       backgroundColor: Colors.green[50],
       resizeToAvoidBottomInset: false,
@@ -152,6 +154,14 @@ class Home extends StatelessWidget {
                       alignment: Alignment(1, 0),
                       padding: EdgeInsets.only(top: 20),
                       child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  type: PageTransitionType.bottomToTop,
+                                  duration: Duration(milliseconds: 500),
+                                  child: Forgot_Password()));
+                        },
                         child: Text(
                           'Forgot Password?',
                           style: TextStyle(
