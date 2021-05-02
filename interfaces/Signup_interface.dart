@@ -2,6 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app/services/verifyEmail.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_app/main.dart';
@@ -51,13 +52,19 @@ class _Signup_interfaceState extends State<Signup_interface> {
     int currentDay = DateTime.now().day;
     int currentMonth = DateTime.now().month;
     int currentYear = DateTime.now().year;
-
-    if(month > currentMonth)
-      return (currentYear - year - 1).toString();
-    else if(day > currentDay)
-      return (currentYear - year - 1).toString();
-    return (currentYear - year).toString();
-
+    int age = currentYear - year;
+    int month1 = currentMonth;
+    int month2 = month;
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      int day1 = currentDay;
+      int day2 = day;
+      if (day2 > day1) {
+        age--;
+      }
+    }
+    return age.toString();
   }
 
   @override
@@ -373,7 +380,12 @@ class _Signup_interfaceState extends State<Signup_interface> {
                           flex: 10,
                           child: Form(
                             key: _phoneNumberFill,
+
                             child: TextFormField(
+                              keyboardType: TextInputType.number,
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
                               validator: (value){
                                 if(value.isEmpty || value == null || value.length != 10 || double.tryParse(value) == null)
                                   return 'Invalid Phone Number!';
@@ -448,7 +460,6 @@ class _Signup_interfaceState extends State<Signup_interface> {
   void saveInfo() async{
     String name = _fullName.text;
     String email = _email.text;
-    String password = _password.text;
     String dob = _currentDay + ' ' + _currentMonth + ',' + _currentYear;
     String bloodType = currentbgrp;
     String age = age_calculator(int.parse(_currentDay),_monthMap[_currentMonth],int.parse(_currentYear));
@@ -456,7 +467,6 @@ class _Signup_interfaceState extends State<Signup_interface> {
     Map<String, String> info = {
       'Name': name,
       'Email': email,
-      'Password': password,
       'Date Of Birth': dob,
       'Age': age,
       'Blood Type': bloodType,

@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/interfaces/Account_Info.dart';
 import 'package:flutter_app/interfaces/Home_page.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter/cupertino.dart';
+
 
 import '../main.dart';
 
@@ -19,8 +23,15 @@ class _LoginWithFacebookState extends State<LoginWithFacebook> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   FacebookLogin _facebookLogin = FacebookLogin();
   User _user;
+  DatabaseReference _ref = FirebaseDatabase.instance.reference().child('DataBase');
 
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +54,10 @@ class _LoginWithFacebookState extends State<LoginWithFacebook> {
                 children: <Widget>[
                   InkWell(
                       onTap: () async{
-                        await _handleLogin();
+                        setState(() {
+                          _handleLogin();
+                        });
+
                       },
                       child: Row(
                         children: [
@@ -79,6 +93,7 @@ class _LoginWithFacebookState extends State<LoginWithFacebook> {
     );
   }
   Future _handleLogin() async {
+
     FacebookLoginResult _result =  await _facebookLogin.logIn(['email']);
     switch(_result.status)
     {
@@ -89,13 +104,16 @@ class _LoginWithFacebookState extends State<LoginWithFacebook> {
         print('Error');
         break;
       case FacebookLoginStatus.loggedIn:
-        Navigator.push(
-            context,
-            PageTransition(
-                type: PageTransitionType.bottomToTop,
-                duration: Duration(milliseconds: 500),
-                child: Home_page()));
-        await _loginWithFacebook(_result);
+        saveInfo();
+        await _loginWithFacebook(_result).then((_)
+        {
+          Navigator.push(
+              context,
+              PageTransition(
+                  child: Home_page())
+          );
+        });
+
         break;
     }
   }
@@ -116,6 +134,23 @@ class _LoginWithFacebookState extends State<LoginWithFacebook> {
 
     });
   }*/
+  void saveInfo() async{
+    String name = 'N/A';
+    String email = 'N/A';
+    String dob = 'N/A';
+    String bloodType = 'N/A';
+    String age = 'N/A';
+    String phoneNumber = 'N/A';
+    Map<String, String> info = {
+      'Name': name,
+      'Email': email,
+      'Date Of Birth': dob,
+      'Age': age,
+      'Blood Type': bloodType,
+      'Phone Number': phoneNumber,
+    };
+    _ref.push().set(info);
+  }
 }
 
 

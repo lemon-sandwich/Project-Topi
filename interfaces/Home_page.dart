@@ -59,7 +59,10 @@ class _Home_pageState extends State<Home_page> {
   @override
   Widget build(BuildContext context) {
     Size _size = MediaQuery.of(context).size;
-    return Scaffold(
+    return new WillPopScope(
+        onWillPop: () async => false,
+
+      child: Scaffold(
       backgroundColor: Colors.grey[200],
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -171,6 +174,7 @@ class _Home_pageState extends State<Home_page> {
               ]),
         ],
       ),
+    )
     );
   }
 }

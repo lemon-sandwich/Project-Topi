@@ -54,106 +54,109 @@ class _CharityState extends State<Charity> {
   @override
   Widget build(BuildContext context) {
     Size _size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-      Row(
-          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        backgroundColor: Colors.grey[200],
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            FlatButton(
-              minWidth: _size.width*0.25,
-              height: _size.height*0.057,
-              color: _colorHome ? Colors.grey[200] : Colors.white,
-              onPressed: () {
-                setState(() {
-                  _colorHome = true;
-                  if (_colorHome) {
-                    _colorCharity = false;
-                    _colorBloodDonations = false;
-                    _colorAccountInfo = false;
-                  }
-                });
-                Navigator.push(
-                    context,
-                    PageTransition(
-                      child: Home_page(),
-                    ));
-              },
-              child: Image.asset('Images/home.png',height: _size.height*0.04,color: Colors.blueAccent,),
-            ),
-            FlatButton(
-              height: _size.height*0.057,
-              minWidth: _size.width*0.25,
-              color: _colorCharity ? Colors.grey[200] : Colors.white,
-              onPressed: () {
-                setState(() {
-                  _colorCharity = true;
-                  if (_colorCharity) {
-                    _colorHome = false;
-                    _colorBloodDonations = false;
-                    _colorAccountInfo = false;
-                  }
-                });
-              },
-              child: Image.asset(
-                'Images/charity.png',
-                height: _size.height*0.04,
-              ),
-            ),
-            FlatButton(
-              height: _size.height*0.057,
-              minWidth: _size.width*0.25,
-              color: _colorBloodDonations ? Colors.grey[200] : Colors.white,
-              onPressed: () {
-                setState(() {
-                  _colorBloodDonations = true;
-                  if (_colorBloodDonations) {
-                    _colorHome = false;
-                    _colorCharity = false;
-                    _colorAccountInfo = false;
-                  }
-                });
-                Navigator.push(
-                    context,
-                    PageTransition(
-                      child: Blood_Donation(),
-                    ));
-              },
-              child: Image(
-                image: AssetImage('Images/blood_donation_color.png'),
-                height: _size.height*0.04,
-              ),
-            ),
-            FlatButton(
-              height: _size.height*0.057,
-              minWidth: _size.width*0.25,
-              color: _colorAccountInfo ? Colors.grey[200] : Colors.white,
-              onPressed: () {
-                setState(() {
-                  _colorAccountInfo = true;
-                  if (_colorAccountInfo) {
-                    _colorHome = false;
-                    _colorBloodDonations = false;
-                    _colorCharity = false;
-                  }
-                  Timer.periodic(const Duration(seconds: 1), (timer) {
-                    if(info != null) {
-                      timer.cancel();
-                      Navigator.push(
-                          context,
-                          PageTransition(
-                              child: Account_Info(info))
-                      );
+        Row(
+            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              FlatButton(
+                minWidth: _size.width*0.25,
+                height: _size.height*0.057,
+                color: _colorHome ? Colors.grey[200] : Colors.white,
+                onPressed: () {
+                  setState(() {
+                    _colorHome = true;
+                    if (_colorHome) {
+                      _colorCharity = false;
+                      _colorBloodDonations = false;
+                      _colorAccountInfo = false;
                     }
                   });
-                });
-              },
-              child: Image.asset('Images/account_circle.png', height: _size.height*0.04,color: Colors.blue,),
-            ),
-          ]),
-        ],
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                        child: Home_page(),
+                      ));
+                },
+                child: Image.asset('Images/home.png',height: _size.height*0.04,color: Colors.blueAccent,),
+              ),
+              FlatButton(
+                height: _size.height*0.057,
+                minWidth: _size.width*0.25,
+                color: _colorCharity ? Colors.grey[200] : Colors.white,
+                onPressed: () {
+                  setState(() {
+                    _colorCharity = true;
+                    if (_colorCharity) {
+                      _colorHome = false;
+                      _colorBloodDonations = false;
+                      _colorAccountInfo = false;
+                    }
+                  });
+                },
+                child: Image.asset(
+                  'Images/charity.png',
+                  height: _size.height*0.04,
+                ),
+              ),
+              FlatButton(
+                height: _size.height*0.057,
+                minWidth: _size.width*0.25,
+                color: _colorBloodDonations ? Colors.grey[200] : Colors.white,
+                onPressed: () {
+                  setState(() {
+                    _colorBloodDonations = true;
+                    if (_colorBloodDonations) {
+                      _colorHome = false;
+                      _colorCharity = false;
+                      _colorAccountInfo = false;
+                    }
+                  });
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                        child: Blood_Donation(),
+                      ));
+                },
+                child: Image(
+                  image: AssetImage('Images/blood_donation_color.png'),
+                  height: _size.height*0.04,
+                ),
+              ),
+              FlatButton(
+                height: _size.height*0.057,
+                minWidth: _size.width*0.25,
+                color: _colorAccountInfo ? Colors.grey[200] : Colors.white,
+                onPressed: () {
+                  setState(() {
+                    _colorAccountInfo = true;
+                    if (_colorAccountInfo) {
+                      _colorHome = false;
+                      _colorBloodDonations = false;
+                      _colorCharity = false;
+                    }
+                    Timer.periodic(const Duration(seconds: 1), (timer) {
+                      if(info != null) {
+                        timer.cancel();
+                        Navigator.push(
+                            context,
+                            PageTransition(
+                                child: Account_Info(info))
+                        );
+                      }
+                    });
+                  });
+                },
+                child: Image.asset('Images/account_circle.png', height: _size.height*0.04,color: Colors.blue,),
+              ),
+            ]),
+          ],
+        ),
       ),
     );
   }

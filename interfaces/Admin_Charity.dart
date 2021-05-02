@@ -1,25 +1,24 @@
-//import 'dart:convert';
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../main.dart';
-import 'Account_Info.dart';
-import 'Home_page.dart';
-import 'Charity.dart';
+import 'package:flutter_app/interfaces/Admin_Blood_Donation.dart';
+import 'package:flutter_app/interfaces/Admin_Interface.dart';
 import 'package:page_transition/page_transition.dart';
 
-class Blood_Donation extends StatefulWidget {
+import 'Admin_Account_Info.dart';
+
+
+class Admin_Charity extends StatefulWidget {
   @override
-  _Blood_DonationState createState() => _Blood_DonationState();
+  _Admin_CharityState createState() => _Admin_CharityState();
 }
 
-class _Blood_DonationState extends State<Blood_Donation>{
+class _Admin_CharityState extends State<Admin_Charity> {
   bool _colorHome = false;
-  bool _colorCharity = false;
-  bool _colorBloodDonations = true;
+  bool _colorCharity = true;
+  bool _colorBloodDonations = false;
   bool _colorAccountInfo = false;
   FirebaseAuth _auth = FirebaseAuth.instance;
   final databaseReference = FirebaseDatabase.instance.reference();
@@ -64,8 +63,8 @@ class _Blood_DonationState extends State<Blood_Donation>{
               //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   FlatButton(
-                    height: _size.height*0.057,
                     minWidth: _size.width*0.25,
+                    height: _size.height*0.057,
                     color: _colorHome ? Colors.grey[200] : Colors.white,
                     onPressed: () {
                       setState(() {
@@ -79,9 +78,8 @@ class _Blood_DonationState extends State<Blood_Donation>{
                       Navigator.push(
                           context,
                           PageTransition(
-                            child: Home_page(),
-                          )
-                      );
+                            child: Admin_Interface(),
+                          ));
                     },
                     child: Image.asset('Images/home.png',height: _size.height*0.04,color: Colors.blueAccent,),
                   ),
@@ -98,12 +96,6 @@ class _Blood_DonationState extends State<Blood_Donation>{
                           _colorAccountInfo = false;
                         }
                       });
-                      Navigator.push(
-                          context,
-                          PageTransition(
-                            child: Charity(),
-                          )
-                      );
                     },
                     child: Image.asset(
                       'Images/charity.png',
@@ -123,10 +115,15 @@ class _Blood_DonationState extends State<Blood_Donation>{
                           _colorAccountInfo = false;
                         }
                       });
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                            child: Admin_Blood_Donation(),
+                          ));
                     },
                     child: Image(
                       image: AssetImage('Images/blood_donation_color.png'),
-                        height: _size.height*0.04,
+                      height: _size.height*0.04,
                     ),
                   ),
                   FlatButton(
@@ -147,7 +144,7 @@ class _Blood_DonationState extends State<Blood_Donation>{
                             Navigator.push(
                                 context,
                                 PageTransition(
-                                    child: Account_Info(info))
+                                    child: Admin_Account_Info(info))
                             );
                           }
                         });

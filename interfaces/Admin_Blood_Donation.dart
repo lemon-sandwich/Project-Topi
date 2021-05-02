@@ -1,22 +1,21 @@
-//import 'dart:convert';
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../main.dart';
-import 'Account_Info.dart';
-import 'Home_page.dart';
-import 'Charity.dart';
+import 'package:flutter_app/interfaces/Admin_Charity.dart';
+import 'package:flutter_app/interfaces/Admin_Interface.dart';
 import 'package:page_transition/page_transition.dart';
 
-class Blood_Donation extends StatefulWidget {
+import 'Admin_Account_Info.dart';
+import 'Home_page.dart';
+
+class Admin_Blood_Donation extends StatefulWidget {
   @override
-  _Blood_DonationState createState() => _Blood_DonationState();
+  _Admin_Blood_DonationState createState() => _Admin_Blood_DonationState();
 }
 
-class _Blood_DonationState extends State<Blood_Donation>{
+class _Admin_Blood_DonationState extends State<Admin_Blood_Donation> {
   bool _colorHome = false;
   bool _colorCharity = false;
   bool _colorBloodDonations = true;
@@ -79,7 +78,7 @@ class _Blood_DonationState extends State<Blood_Donation>{
                       Navigator.push(
                           context,
                           PageTransition(
-                            child: Home_page(),
+                            child: Admin_Interface(),
                           )
                       );
                     },
@@ -101,7 +100,7 @@ class _Blood_DonationState extends State<Blood_Donation>{
                       Navigator.push(
                           context,
                           PageTransition(
-                            child: Charity(),
+                            child: Admin_Charity(),
                           )
                       );
                     },
@@ -126,7 +125,7 @@ class _Blood_DonationState extends State<Blood_Donation>{
                     },
                     child: Image(
                       image: AssetImage('Images/blood_donation_color.png'),
-                        height: _size.height*0.04,
+                      height: _size.height*0.04,
                     ),
                   ),
                   FlatButton(
@@ -147,7 +146,7 @@ class _Blood_DonationState extends State<Blood_Donation>{
                             Navigator.push(
                                 context,
                                 PageTransition(
-                                    child: Account_Info(info))
+                                    child: Admin_Account_Info(info))
                             );
                           }
                         });
