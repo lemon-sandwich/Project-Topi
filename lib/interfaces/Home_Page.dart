@@ -34,13 +34,11 @@ class _Home_PageState extends State<Home_Page>
   final databaseReference = FirebaseDatabase.instance.reference();
   Map info;
   Map _posts;
-  int total_posts = 0;
   bool empty = false;
   //List<Widget> Cards = NumberOfCards(total_posts);
   List<Widget> Cards = [SizedBox(height: 0,)];
   void readData() {
     databaseReference.once().then((DataSnapshot snapshot) {
-      total_posts = 0;
 
       // DATABASE USER INFORMATION
 
@@ -58,7 +56,6 @@ class _Home_PageState extends State<Home_Page>
           break;
         }
       }
-
       //  DATABASE GATHER ALL POSTS
 
       Cards = [SizedBox(height: 0,)];
@@ -76,7 +73,7 @@ class _Home_PageState extends State<Home_Page>
               'Description': key['Description'],
               'Donation Type': key['Donation Type'],
           };
-          total_posts++;
+
           Cards.add(Card(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -210,6 +207,25 @@ class _Home_PageState extends State<Home_Page>
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if(index == 0) {
+        _home_show = false;
+        Timer.periodic(const Duration(milliseconds: 1), (timer) {
+          readData();
+          if (info != null) {
+            print('INFO NOT NULL');
+            if(empty)
+              print('POSTS ARE EMPTY');
+            else if(_posts != null)
+              print('POSTS NOT NULL');
+            timer.cancel();
+
+            setState(() {
+              _show = true;
+              _home_show = true;
+            });
+          }
+        });
+      }
     });
   }
 
@@ -412,12 +428,30 @@ class _Home_PageState extends State<Home_Page>
     _animationController.dispose();
     super.dispose();
   }
-
   bool _show = false;
   bool _home_show = false;
-
+  bool done = false;
   @override
   Widget build(BuildContext context) {
+    if (!done)
+      {
+      Timer.periodic(const Duration(milliseconds: 3), (timer) {
+        readData();
+        if (info != null) {
+          print('INFO NOT NULL');
+          if (empty)
+            print('POSTS ARE EMPTY');
+          else if (_posts != null)
+            print('POSTS NOT NULL');
+          timer.cancel();
+          setState(() {
+            _show = true;
+            _home_show = true;
+            done = true;
+          });
+        }
+      });
+  }
     child:
     Text(widget._admin.toString());
     Size _size = MediaQuery.of(context).size;

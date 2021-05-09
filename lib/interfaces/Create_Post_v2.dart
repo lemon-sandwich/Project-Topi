@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -59,7 +58,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
   @override
   void initState() {
     // TODO: implement initState
-    Timer.periodic(const Duration(seconds: 3), (timer) {
+    Timer.periodic(const Duration(milliseconds: 1), (timer) {
       print('Loading...');
       print(_donation_types);
       if (_donation_types[0] != null) {
@@ -80,7 +79,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
   Widget build(BuildContext context) {
     return _show
         ? Scaffold(
-        resizeToAvoidBottomInset: false,
+       // resizeToAvoidBottomInset: false,
         backgroundColor: Colors.green[50],
         appBar: AppBar(
           backgroundColor: Colors.blueAccent[100],
@@ -107,7 +106,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
             ],
           ),
         ),
-        body: Column(
+        body: ListView(
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
