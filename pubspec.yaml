@@ -73,31 +73,38 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: OSC
-      fonts:
-        - asset: Fonts/OpenSansCondensed-Bold.ttf
-        - asset: Fonts/OpenSansCondensed-Light.ttf
-        - asset: Fonts/OpenSansCondensed-LightItalic.ttf
-    - family: Montserrat
-      fonts:
-        - asset: Fonts/Montserrat-Black.ttf
-        - asset: Fonts/Montserrat-BlackItalic.ttf
-        - asset: Fonts/Montserrat-Bold.ttf
-        - asset: Fonts/Montserrat-BoldItalic.ttf
-        - asset: Fonts/Montserrat-ExtraBold.ttf
-        - asset: Fonts/Montserrat-ExtraBoldItalic.ttf
-        - asset: Fonts/Montserrat-ExtraLight.ttf
-        - asset: Fonts/Montserrat-ExtraLightItalic.ttf
-        - asset: Fonts/Montserrat-Italic.ttf
-        - asset: Fonts/Montserrat-Light.ttf
-        - asset: Fonts/Montserrat-LightItalic.ttf
-        - asset: Fonts/Montserrat-Medium.ttf
-        - asset: Fonts/Montserrat-MediumItalic.ttf
-        - asset: Fonts/Montserrat-Regular.ttf
-        - asset: Fonts/Montserrat-SemiBold.ttf
-        - asset: Fonts/Montserrat-SemiBoldItalic.ttf
-        - asset: Fonts/Montserrat-Thin.ttf
-        - asset: Fonts/Montserrat-ThinItalic.ttf
-
+        - family: Lexend
+          fonts:
+            - asset: Fonts/Lexend-Regular.ttf
+            - asset: Fonts/Lexend-ExtraBold.ttf
+            - asset: Fonts/Lexend-SemiBold.ttf
+            - asset: Fonts/Lexend-Light.ttf
+            - asset: Fonts/Lexend-Medium.ttf
+            - asset: Fonts/Lexend-Thin.ttf
+        - family: OSC
+          fonts:
+            - asset: Fonts/OpenSansCondensed-Bold.ttf
+            - asset: Fonts/OpenSansCondensed-Light.ttf
+            - asset: Fonts/OpenSansCondensed-LightItalic.ttf
+        - family: Montserrat
+          fonts:
+            - asset: Fonts/Montserrat-Black.ttf
+            - asset: Fonts/Montserrat-BlackItalic.ttf
+            - asset: Fonts/Montserrat-Bold.ttf
+            - asset: Fonts/Montserrat-BoldItalic.ttf
+            - asset: Fonts/Montserrat-ExtraBold.ttf
+            - asset: Fonts/Montserrat-ExtraBoldItalic.ttf
+            - asset: Fonts/Montserrat-ExtraLight.ttf
+            - asset: Fonts/Montserrat-ExtraLightItalic.ttf
+            - asset: Fonts/Montserrat-Italic.ttf
+            - asset: Fonts/Montserrat-Light.ttf
+            - asset: Fonts/Montserrat-LightItalic.ttf
+            - asset: Fonts/Montserrat-Medium.ttf
+            - asset: Fonts/Montserrat-MediumItalic.ttf
+            - asset: Fonts/Montserrat-Regular.ttf
+            - asset: Fonts/Montserrat-SemiBold.ttf
+            - asset: Fonts/Montserrat-SemiBoldItalic.ttf
+            - asset: Fonts/Montserrat-Thin.ttf
+            - asset: Fonts/Montserrat-ThinItalic.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

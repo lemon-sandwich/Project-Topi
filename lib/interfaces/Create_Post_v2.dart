@@ -100,7 +100,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                 child: Text('POST',
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Montserrat-Light.tff',
+                      fontFamily: 'Montserrat',
                     )),
               )
             ],
@@ -125,7 +125,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                     ),
                     labelText: 'TITLE',
                     labelStyle: TextStyle(
-                      fontFamily: 'Montserrat-Light.tff',
+                      fontFamily: 'Montserrat',
                       color: Colors.grey,
                       fontSize: 12,
                     ),
@@ -150,7 +150,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                     ),
                     labelText: 'AMOUNT REQUIRED',
                     labelStyle: TextStyle(
-                      fontFamily: 'Montserrat-Light.tff',
+                      fontFamily: 'Montserrat',
                       color: Colors.grey,
                       fontSize: 12,
                     ),
@@ -169,7 +169,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                   ),
                   labelText: 'DESCRIPTION',
                   labelStyle: TextStyle(
-                    fontFamily: 'Montserrat-Light.tff',
+                    fontFamily: 'Montserrat',
                     color: Colors.grey,
                     fontSize: 12,
                   ),
@@ -187,7 +187,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                     child: Text(dropDownItems,
                         style: TextStyle(
                           fontSize: 15,
-                          fontFamily: 'Montserrat-Thin.ttf',
+                          fontFamily: 'Montserrat',
                           fontWeight: FontWeight.w300,
                         )),
                   );
@@ -223,7 +223,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                     ),
                     labelText: 'DONATION TYPE',
                     labelStyle: TextStyle(
-                      fontFamily: 'Montserrat-Light.tff',
+                      fontFamily: 'Montserrat',
                       color: Colors.grey,
                       fontSize: 12,
                     ),

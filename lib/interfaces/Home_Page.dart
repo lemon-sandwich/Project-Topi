@@ -73,34 +73,68 @@ class _Home_PageState extends State<Home_Page>
               'Description': key['Description'],
               'Donation Type': key['Donation Type'],
           };
-
+          bool description = true;
+          if(_posts['Description'] == '(Not Available)')
+            description = false;
           Cards.add(Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(
-                      height: 10,
+            elevation: 10,
+              margin: EdgeInsets.only(bottom: 10),
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              color: Colors.grey[800],
+              shadowColor: Colors.blueAccent,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Card(
+                    elevation: 10,
+                    margin: EdgeInsets.only(bottom: 10),
+                    clipBehavior: Clip.antiAlias,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                    Text(
-                      _posts['Title'],
-                      style: TextStyle(
-                        fontFamily: 'Montserrat-Light.tff',
-                        fontSize: 20,
-                        color: Colors.pink,
+                    color: Colors.orange,
+                    shadowColor: Colors.orangeAccent,
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _posts['Title'],
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            'Rs. ${_posts['Amount']}/-',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                    SizedBox(
-                      height: 3,
-                    ),
-                    Row(
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  description? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
                       children: [
                         Text(
                           'DESCRIPTION: ',
                           style: TextStyle(
-                            fontFamily: 'Montserrat-Light.tff',
-                            color: Colors.orange,
+                            fontFamily: 'Montserrat',
+                            color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
@@ -111,48 +145,29 @@ class _Home_PageState extends State<Home_Page>
                         Text(
                           _posts['Description'],
                           style: TextStyle(
-                            fontFamily: 'Montserrat-Light.tff',
+                            fontFamily: 'Montserrat',
                             fontSize: 15,
+                            color: Colors.white,
                           ),
                         )
                       ],
                     ),
-                    SizedBox(
-                      height: 3,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'AMOUNT: ',
-                          style: TextStyle(
-                            fontFamily: 'Montserrat-Light.tff',
-                            color: Colors.orange,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Text(
-                          _posts['Amount'],
-                          style: TextStyle(
-                            fontFamily: 'Montserrat-Light.tff',
-                            fontSize: 15,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 3,
-                    ),
-                    Row(
+                  ):  SizedBox(height:0),
+                  description? SizedBox(
+                    height: 8,
+                  ): SizedBox(height:0),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
                       children: [
                         Text(
                           'DONATION TYPE: ',
                           style: TextStyle(
-                            fontFamily: 'Montserrat-Light.tff',
-                            color: Colors.orange,
+                            fontFamily: 'Montserrat',
+                            color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
@@ -163,40 +178,45 @@ class _Home_PageState extends State<Home_Page>
                         Text(
                           _posts['Donation Type'],
                           style: TextStyle(
-                            fontFamily: 'Montserrat-Light.tff',
+                            fontFamily: 'Montserrat',
                             fontSize: 15,
+                            color: Colors.white,
                           ),
                         )
                       ],
                     ),
-                    SizedBox(
-                      height: 25,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        InkWell(
-                          onTap: () {},
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'DONATE',
-                              style: TextStyle(
-                                fontFamily: 'Montserrat-Light.tff',
-                                fontSize: 15,
-                              ),
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.green,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'DONATE',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 15,
+                              color: Colors.white,
                             ),
-                          ),),
-                        SizedBox(
-                          width: 15,
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                  ],
-                ),
+                          ),
+                        ),),
+                      SizedBox(
+                        width: 15,
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                ],
               )));
         }
       }
@@ -208,6 +228,7 @@ class _Home_PageState extends State<Home_Page>
     setState(() {
       _selectedIndex = index;
       if(index == 0) {
+        _show = false;
         _home_show = false;
         Timer.periodic(const Duration(milliseconds: 1), (timer) {
           readData();
@@ -327,6 +348,8 @@ class _Home_PageState extends State<Home_Page>
     }
     _user = _auth.currentUser;
     Timer.periodic(const Duration(milliseconds: 1), (timer) {
+      _show = false;
+      _home_show = false;
       readData();
       if (info != null) {
         print('INFO NOT NULL');
@@ -436,6 +459,8 @@ class _Home_PageState extends State<Home_Page>
     if (!done)
       {
       Timer.periodic(const Duration(milliseconds: 3), (timer) {
+        _show = false;
+        _home_show = false;
         readData();
         if (info != null) {
           print('INFO NOT NULL');
@@ -524,7 +549,7 @@ class _Home_PageState extends State<Home_Page>
                                               labelText: 'FULL NAME',
                                               labelStyle: TextStyle(
                                                 fontFamily:
-                                                    'Montserrat-Light.tff',
+                                                    'Montserrat',
                                                 color: Colors.grey,
                                                 fontSize: 12,
                                               ),
@@ -650,7 +675,7 @@ class _Home_PageState extends State<Home_Page>
                                               labelText: 'BLOOD TYPE',
                                               labelStyle: TextStyle(
                                                 fontFamily:
-                                                    'Montserrat-Light.tff',
+                                                    'Montserrat',
                                                 color: Colors.grey,
                                                 fontSize: 12,
                                               ),
@@ -774,7 +799,7 @@ class _Home_PageState extends State<Home_Page>
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           fontFamily:
-                                                              'Montserrat-Thin.ttf',
+                                                              'Montserrat',
                                                           fontWeight:
                                                               FontWeight.w300,
                                                         )),
@@ -798,7 +823,7 @@ class _Home_PageState extends State<Home_Page>
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           fontFamily:
-                                                              'Montserrat-Thin.ttf',
+                                                              'Montserrat',
                                                           fontWeight:
                                                               FontWeight.w300,
                                                         )),
@@ -822,7 +847,7 @@ class _Home_PageState extends State<Home_Page>
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           fontFamily:
-                                                              'Montserrat-Thin.ttf',
+                                                              'Montserrat',
                                                           fontWeight:
                                                               FontWeight.w300,
                                                         )),
@@ -952,7 +977,7 @@ class _Home_PageState extends State<Home_Page>
                                     Text('Logout',
                                         style: TextStyle(
                                           color: Colors.grey,
-                                          fontFamily: 'Montserrat-Thin.tff',
+                                          fontFamily: 'Montserrat',
                                           fontSize: 20,
                                         )),
                                     SizedBox(

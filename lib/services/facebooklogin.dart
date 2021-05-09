@@ -68,7 +68,7 @@ class _LoginWithFacebookState extends State<LoginWithFacebook> {
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
-                                fontFamily: 'Montserrat-Thin.ttf'),
+                                fontFamily: 'Montserrat'),
                           )],)
                   ),
                 ],

@@ -87,7 +87,7 @@ class _HomeState extends State<Home> {
                         'Project',
                         style: TextStyle(
                           fontSize: 70,
-                          fontFamily: 'Montserrat-Black.tff',
+                          fontFamily: 'Montserrat',
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
                         ),
@@ -99,7 +99,7 @@ class _HomeState extends State<Home> {
                         'Topi',
                         style: TextStyle(
                           fontSize: 70,
-                          fontFamily: 'Montserrat-Black.tff',
+                          fontFamily: 'Montserrat',
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
                         ),
@@ -130,7 +130,7 @@ class _HomeState extends State<Home> {
                           ),
                           labelText: 'EMAIL',
                           labelStyle: TextStyle(
-                            fontFamily: 'Montserrat-Light.tff',
+                            fontFamily: 'Montserrat',
                             color: Colors.grey,
                             fontSize: 12,
                           ),
@@ -158,7 +158,7 @@ class _HomeState extends State<Home> {
                                 ),
                                 labelText: 'PASSWORD',
                                 labelStyle: TextStyle(
-                                  fontFamily: 'Montserrat-Light.tff',
+                                  fontFamily: 'Montserrat',
                                   color: Colors.grey,
                                   fontSize: 12,
                                 ),
@@ -201,7 +201,7 @@ class _HomeState extends State<Home> {
                               decoration: TextDecoration.underline,
                               color: Colors.grey[500],
                               letterSpacing: 0.3,
-                              fontFamily: 'Montserrat-Thin.tff'),
+                              fontFamily: 'Montserrat'),
                         ),
                       ),
                     ),
@@ -253,7 +253,7 @@ class _HomeState extends State<Home> {
                                 child: Text('Login',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontFamily: 'Montserrat-Thin.tff',
+                                      fontFamily: 'Montserrat',
                                       fontSize: 20,
                                     ))),
                           )),
@@ -297,7 +297,7 @@ class _HomeState extends State<Home> {
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 15,
-                                            fontFamily: 'Montserrat-Thin.ttf'),
+                                            fontFamily: 'Montserrat'),
                                       )
                                     ],
                                   )),
@@ -311,7 +311,7 @@ class _HomeState extends State<Home> {
                         Text(
                           'New to Project-Topi?',
                           style: TextStyle(
-                            fontFamily: 'Montserrat-Thin.ttf',
+                            fontFamily: 'Montserrat',
                             color: Colors.grey,
                           ),
                         ),

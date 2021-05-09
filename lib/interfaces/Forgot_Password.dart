@@ -39,7 +39,7 @@ class _Forgot_PasswordState extends State<Forgot_Password> {
                     labelText: 'EMAIL',
                     labelStyle: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Montserrat-Thin.ttf',
+                      fontFamily: 'Montserrat',
                     ),
                   ),
 
@@ -69,7 +69,7 @@ class _Forgot_PasswordState extends State<Forgot_Password> {
                         child: Text('SEND REQUEST',
                             style: TextStyle(
                               color: Colors.white,
-                              fontFamily: 'Montserrat-Thin.tff',
+                              fontFamily: 'Montserrat',
                               fontSize: 20,
                             ))),
                   )))

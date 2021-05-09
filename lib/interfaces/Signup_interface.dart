@@ -122,7 +122,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                   child: Text('REGISTER',
                       style: TextStyle(
                         color: Colors.green,
-                        fontFamily: 'Montserrat-Thin-ttf',
+                        fontFamily: 'Montserrat',
                         fontWeight: FontWeight.bold,
                         fontSize: 40,
                       ))),
@@ -151,7 +151,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                         controller: _fullName,
                         style: TextStyle(
                           fontSize: 15,
-                          fontFamily: 'Montserrat-Thin.ttf',
+                          fontFamily: 'Montserrat',
                           fontWeight: FontWeight.w300,
                         ),
                         decoration: InputDecoration(
@@ -159,7 +159,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                           hintText: 'Jon Doe',
                           labelStyle: TextStyle(
                             fontSize: 12,
-                            fontFamily: 'Montserrat-Thin.ttf',
+                            fontFamily: 'Montserrat',
                           ),
                         ),
                       ),
@@ -179,7 +179,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                         controller: _email,
                         style: TextStyle(
                           fontSize: 15,
-                          fontFamily: 'Montserrat-Thin.ttf',
+                          fontFamily: 'Montserrat',
                           fontWeight: FontWeight.w300,
                         ),
                         decoration: InputDecoration(
@@ -187,7 +187,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                           labelText: 'EMAIL',
                           labelStyle: TextStyle(
                             fontSize: 12,
-                            fontFamily: 'Montserrat-Thin.ttf',
+                            fontFamily: 'Montserrat',
                           ),
                         ),
                       ),
@@ -201,7 +201,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],
-                            fontFamily: 'Montserrat-Thin.ttf',
+                            fontFamily: 'Montserrat',
                             fontWeight: FontWeight.w300,
                           ),
                         ),
@@ -213,7 +213,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                               child: new Text(dropDownItems,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontFamily: 'Montserrat-Thin.ttf',
+                                    fontFamily: 'Montserrat',
                                     fontWeight: FontWeight.w300,
                                   )),
                             );
@@ -232,7 +232,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                               child: new Text(dropDownItems,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontFamily: 'Montserrat-Thin.ttf',
+                                    fontFamily: 'Montserrat',
                                     fontWeight: FontWeight.w300,
                                   )),
                             );
@@ -251,7 +251,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                               child: new Text(dropDownItems,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontFamily: 'Montserrat-Thin.ttf',
+                                    fontFamily: 'Montserrat',
                                     fontWeight: FontWeight.w300,
                                   )),
                             );
@@ -283,14 +283,14 @@ class _Signup_interfaceState extends State<Signup_interface> {
                               controller: _password,
                               style: TextStyle(
                                 fontSize: 15,
-                                fontFamily: 'Montserrat-Thin.ttf',
+                                fontFamily: 'Montserrat',
                                 fontWeight: FontWeight.w300,
                               ),
                               decoration: InputDecoration(
                                 labelText: 'PASSWORD',
                                 labelStyle: TextStyle(
                                   fontSize: 12,
-                                  fontFamily: 'Montserrat-Thin.ttf',
+                                  fontFamily: 'Montserrat',
                                 ),
                               ),
                             ),
@@ -320,14 +320,14 @@ class _Signup_interfaceState extends State<Signup_interface> {
                               controller: _rePass,
                               style: TextStyle(
                                 fontSize: 15,
-                                fontFamily: 'Montserrat-Thin.ttf',
+                                fontFamily: 'Montserrat',
                                 fontWeight: FontWeight.w300,
                               ),
                               decoration: InputDecoration(
                                 labelText: 'CONFIRM PASSWORD',
                                 labelStyle: TextStyle(
                                   fontSize: 12,
-                                  fontFamily: 'Montserrat-Thin.ttf',
+                                  fontFamily: 'Montserrat',
                                 ),
                               ),
                             ),
@@ -350,7 +350,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                           child: Text(dropDownItems,
                               style: TextStyle(
                                 fontSize: 15,
-                                fontFamily: 'Montserrat-Thin.ttf',
+                                fontFamily: 'Montserrat',
                                 fontWeight: FontWeight.w300,
                               )),
                         );
@@ -369,7 +369,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                           child: Text('+92',
                               style: TextStyle(
                                 fontSize: 15,
-                                fontFamily: 'Montserrat-Thin.ttf',
+                                fontFamily: 'Montserrat',
                                 fontWeight: FontWeight.w300,
                               )),
                         ),
@@ -394,14 +394,14 @@ class _Signup_interfaceState extends State<Signup_interface> {
                               controller: _phoneNumber,
                               style: TextStyle(
                                 fontSize: 15,
-                                fontFamily: 'Montserrat-Thin.ttf',
+                                fontFamily: 'Montserrat',
                                 fontWeight: FontWeight.w300,
                               ),
                               decoration: InputDecoration(
                                 labelText: 'PHONE NUMBER',
                                 labelStyle: TextStyle(
                                   fontSize: 12,
-                                  fontFamily: 'Montserrat-Thin.ttf',
+                                  fontFamily: 'Montserrat',
                                 ),
                               ),
                             ),
@@ -443,7 +443,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
                                   child: Text('Register',
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontFamily: 'Montserrat-Thin.tff',
+                                        fontFamily: 'Montserrat',
                                         fontSize: 20,
                                       ))),
                             ))),
