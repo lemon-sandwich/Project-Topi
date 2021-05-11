@@ -4,10 +4,14 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/interfaces/Loading_Screen.dart';
+import 'package:flutter_app/interfaces/Post_Info.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'Create_Post_v2.dart';
+import 'Delete_Post.dart';
+import 'Donate.dart';
+import 'Edit_Post.dart';
 
 class Home_Page extends StatefulWidget {
   bool _admin;
@@ -20,10 +24,10 @@ class _Home_PageState extends State<Home_Page>
     with SingleTickerProviderStateMixin {
   bool isOpened = false;
   bool _is_home_page = false;
-  AnimationController _animationController;
+  /*AnimationController _animationController;
   Animation<Color> _buttonColor;
   Animation<double> _animationIcon;
-  Animation<double> _translateButton;
+  Animation<double> _translateButton;*/
   Curve _curve = Curves.easeOut;
   double _fabHeight = 56.0;
   bool _colorHome = true;
@@ -35,11 +39,16 @@ class _Home_PageState extends State<Home_Page>
   Map info;
   Map _posts;
   bool empty = false;
+  bool edit_delete = false;
   //List<Widget> Cards = NumberOfCards(total_posts);
-  List<Widget> Cards = [SizedBox(height: 0,)];
+  List<Widget> Cards = [
+    SizedBox(
+      height: 0,
+    )
+  ];
+  List<Map> all_posts = [];
   void readData() {
     databaseReference.once().then((DataSnapshot snapshot) {
-
       // DATABASE USER INFORMATION
 
       Map<dynamic, dynamic> values = snapshot.value['DataBase'];
@@ -58,33 +67,33 @@ class _Home_PageState extends State<Home_Page>
       }
       //  DATABASE GATHER ALL POSTS
 
-      Cards = [SizedBox(height: 0,)];
+      Cards = [
+        SizedBox(
+          height: 0,
+        )
+      ];
       values = snapshot.value['Posts'];
-      if(values == null)
-        {
-          empty = true;
-          print('No Post Made Yet');
-        }
-      else {
+      if (values == null) {
+        empty = true;
+        print('No Post Made Yet');
+      } else {
         for (var key in values.values) {
           _posts = {
-              'Title': key['Title'],
-              'Amount': key['Amount'],
-              'Description': key['Description'],
-              'Donation Type': key['Donation Type'],
+            'Title': key['Title'],
+            'Amount': key['Amount'],
+            'Description': key['Description'],
+            'Donation Type': key['Donation Type'],
           };
-          bool description = true;
-          if(_posts['Description'] == '(Not Available)')
-            description = false;
+          all_posts.add(_posts);
           Cards.add(Card(
-            elevation: 10,
+              elevation: 10,
               margin: EdgeInsets.only(bottom: 10),
               clipBehavior: Clip.antiAlias,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
               ),
               color: Colors.grey[800],
-              shadowColor: Colors.blueAccent,
+              shadowColor: Colors.orangeAccent,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -103,16 +112,20 @@ class _Home_PageState extends State<Home_Page>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            _posts['Title'],
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 20,
-                              color: Colors.white,
+                          Flexible(
+                            child: Text(
+                              _posts['Title'],
+                              overflow: TextOverflow.clip,  
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           Text(
                             'Rs. ${_posts['Amount']}/-',
+                            overflow: TextOverflow.clip,
                             style: TextStyle(
                               fontFamily: 'Montserrat',
                               fontSize: 20,
@@ -126,36 +139,36 @@ class _Home_PageState extends State<Home_Page>
                   SizedBox(
                     height: 8,
                   ),
-                  description? Padding(
+                  Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'DESCRIPTION: ',
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Text(
-                          _posts['Description'],
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontSize: 15,
-                            color: Colors.white,
-                          ),
-                        )
-                      ],
+                    child: Text(
+                      'DESCRIPTION: ',
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ):  SizedBox(height:0),
-                  description? SizedBox(
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text(
+                      _posts['Description'],
+                      overflow: TextOverflow.clip,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 15,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
                     height: 8,
-                  ): SizedBox(height:0),
+                  ),
                   SizedBox(
                     height: 8,
                   ),
@@ -193,9 +206,18 @@ class _Home_PageState extends State<Home_Page>
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          print('Pressed');
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                type: PageTransitionType.bottomToTop,
+                                duration: Duration(milliseconds: 500),
+                                child: Donate(),
+                              ));
+                        },
                         style: ElevatedButton.styleFrom(
-                            primary: Colors.green,
+                          primary: Colors.green,
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -207,7 +229,8 @@ class _Home_PageState extends State<Home_Page>
                               color: Colors.white,
                             ),
                           ),
-                        ),),
+                        ),
+                      ),
                       SizedBox(
                         width: 15,
                       )
@@ -227,17 +250,16 @@ class _Home_PageState extends State<Home_Page>
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      if(index == 0) {
+      if (index == 0) {
         _show = false;
         _home_show = false;
         Timer.periodic(const Duration(milliseconds: 1), (timer) {
           readData();
           if (info != null) {
             print('INFO NOT NULL');
-            if(empty)
+            if (empty)
               print('POSTS ARE EMPTY');
-            else if(_posts != null)
-              print('POSTS NOT NULL');
+            else if (_posts != null) print('POSTS NOT NULL');
             timer.cancel();
 
             setState(() {
@@ -292,7 +314,7 @@ class _Home_PageState extends State<Home_Page>
   @override
   void initState() {
     // TODO: implement initState
-    _animationController =
+    /*_animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 250))
           ..addListener(() {
             setState(() {});
@@ -307,7 +329,7 @@ class _Home_PageState extends State<Home_Page>
       begin: _fabHeight,
       end: -14,
     ).animate(CurvedAnimation(
-        parent: _animationController, curve: Interval(0, 0.75, curve: _curve)));
+        parent: _animationController, curve: Interval(0, 0.75, curve: _curve)));*/
     super.initState();
     _date = DateTime.now();
     _currentMonth = DateFormat('MMMM').format(_date);
@@ -353,10 +375,9 @@ class _Home_PageState extends State<Home_Page>
       readData();
       if (info != null) {
         print('INFO NOT NULL');
-        if(empty)
-            print('POSTS ARE EMPTY');
-        else if(_posts != null)
-          print('POSTS NOT NULL');
+        if (empty)
+          print('POSTS ARE EMPTY');
+        else if (_posts != null) print('POSTS NOT NULL');
         timer.cancel();
 
         setState(() {
@@ -367,75 +388,8 @@ class _Home_PageState extends State<Home_Page>
     });
   }
 
-  Widget buttonAdd() {
-    return Container(
-      child: FloatingActionButton(
-        heroTag: "Button1",
-        onPressed: () {
-          Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.bottomToTop,
-                duration: Duration(milliseconds: 500),
-                child: Create_Post_v2(empty),
-              ));
-        },
-        tooltip: 'Add',
-        child: Image.asset(
-          'Images/plus.png',
-          color: Colors.white,
-          height: 20,
-        ),
-      ),
-    );
-  }
 
-  Widget buttonEdit() {
-    return Container(
-      child: FloatingActionButton(
-        heroTag: "Button2",
-        onPressed: () {},
-        tooltip: 'Edit',
-        child: Image.asset(
-          'Images/edit.png',
-          color: Colors.white,
-          height: 20,
-        ),
-      ),
-    );
-  }
-
-  Widget buttonDelete() {
-    return Container(
-      child: FloatingActionButton(
-        heroTag: "Button3",
-        onPressed: () {},
-        tooltip: 'Delete',
-        child: Image.asset(
-          'Images/delete.png',
-          color: Colors.white,
-          height: 20,
-        ),
-      ),
-    );
-  }
-
-  Widget buttonToggle() {
-    return Container(
-      child: FloatingActionButton(
-        heroTag: "Button4",
-        backgroundColor: _buttonColor.value,
-        onPressed: animate,
-        tooltip: 'Toggle',
-        child: AnimatedIcon(
-          icon: AnimatedIcons.menu_close,
-          progress: _animationIcon,
-        ),
-      ),
-    );
-  }
-
-  animate() {
+  /*animate() {
     // setState(() {
     if (!isOpened)
       _animationController.forward();
@@ -443,21 +397,21 @@ class _Home_PageState extends State<Home_Page>
       _animationController.reverse();
     isOpened = !isOpened;
     //  });
-  }
+  }*/
 
   @override
   void dispose() {
     // TODO: implement dispose
-    _animationController.dispose();
+   // _animationController.dispose();
     super.dispose();
   }
+
   bool _show = false;
   bool _home_show = false;
   bool done = false;
   @override
   Widget build(BuildContext context) {
-    if (!done)
-      {
+    if (!done) {
       Timer.periodic(const Duration(milliseconds: 3), (timer) {
         _show = false;
         _home_show = false;
@@ -466,8 +420,7 @@ class _Home_PageState extends State<Home_Page>
           print('INFO NOT NULL');
           if (empty)
             print('POSTS ARE EMPTY');
-          else if (_posts != null)
-            print('POSTS NOT NULL');
+          else if (_posts != null) print('POSTS NOT NULL');
           timer.cancel();
           setState(() {
             _show = true;
@@ -476,7 +429,7 @@ class _Home_PageState extends State<Home_Page>
           });
         }
       });
-  }
+    }
     child:
     Text(widget._admin.toString());
     Size _size = MediaQuery.of(context).size;
@@ -485,11 +438,25 @@ class _Home_PageState extends State<Home_Page>
           ? Scaffold(
               backgroundColor: Colors.grey[200],
               body: Padding(
-                  padding: EdgeInsets.fromLTRB(10, _size.height * 0.08, 10, 0),
-                  child: new ListView.builder(
+                padding: EdgeInsets.fromLTRB(10, _size.height * 0.08, 10, 0),
+                child: new ListView.builder(
                   itemCount: Cards.length,
-                  itemBuilder: (BuildContext context,int index) => Cards.elementAt(index)
-                  )
+                  itemBuilder: (BuildContext context, int index) {
+                    return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                type: PageTransitionType.bottomToTop,
+                                duration: Duration(milliseconds: 500),
+                                child: Post_Info(all_posts[index]),
+                              ));
+                          setState(() {
+                          });
+                        },
+                        child: Cards.elementAt(index));
+                  },
+                ),
               ),
             )
           : Loading_Screen(),
@@ -548,8 +515,7 @@ class _Home_PageState extends State<Home_Page>
                                               ),
                                               labelText: 'FULL NAME',
                                               labelStyle: TextStyle(
-                                                fontFamily:
-                                                    'Montserrat',
+                                                fontFamily: 'Montserrat',
                                                 color: Colors.grey,
                                                 fontSize: 12,
                                               ),
@@ -674,8 +640,7 @@ class _Home_PageState extends State<Home_Page>
                                               ),
                                               labelText: 'BLOOD TYPE',
                                               labelStyle: TextStyle(
-                                                fontFamily:
-                                                    'Montserrat',
+                                                fontFamily: 'Montserrat',
                                                 color: Colors.grey,
                                                 fontSize: 12,
                                               ),
@@ -1012,26 +977,23 @@ class _Home_PageState extends State<Home_Page>
           body: _widgetOptions.elementAt(_selectedIndex),
           floatingActionButton: Opacity(
             opacity: widget._admin && _is_home_page ? 1 : 0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Transform(
-                  transform: Matrix4.translationValues(
-                      0, _translateButton.value * 3.0, 0),
-                  child: buttonAdd(),
-                ),
-                Transform(
-                  transform: Matrix4.translationValues(
-                      0, _translateButton.value * 2.0, 0),
-                  child: buttonEdit(),
-                ),
-                Transform(
-                  transform:
-                      Matrix4.translationValues(0, _translateButton.value, 0),
-                  child: buttonDelete(),
-                ),
-                buttonToggle(),
-              ],
+            child: FloatingActionButton(
+              heroTag: "Add Post",
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    PageTransition(
+                      type: PageTransitionType.bottomToTop,
+                      duration: Duration(milliseconds: 500),
+                      child: Create_Post_v2(empty),
+                    ));
+              },
+              tooltip: 'Add',
+              child: Image.asset(
+                'Images/plus.png',
+                color: Colors.white,
+                height: 20,
+              ),
             ),
           ),
           bottomNavigationBar: BottomNavigationBar(

@@ -16,29 +16,34 @@ class Create_Post_v2 extends StatefulWidget {
 
 class _Create_Post_v2State extends State<Create_Post_v2> {
   TextEditingController _post_title = TextEditingController();
-  TextEditingController _post_text = TextEditingController();
+  TextEditingController _post_description = TextEditingController();
   TextEditingController _post_amount = TextEditingController();
   TextEditingController _post_other_donation = TextEditingController();
   String _donation_selected;
   bool _other = false;
   final _title = GlobalKey<FormState>();
+  final _description = GlobalKey<FormState>();
   final _other_donation = GlobalKey<FormState>();
   final _amount = GlobalKey<FormState>();
+  bool _title_check = true;
+  bool _amount_check = true;
+  bool _description_check = true;
+  bool _other_check = true;
   DatabaseReference _databaseReference;
   final _donation_ref = FirebaseDatabase.instance.reference();
   FirebaseAuth _auth = FirebaseAuth.instance;
   bool _show = false;
-  List<String> _donation_types = ['Zakat','Fitrana','Sadqa','Other'];
+  List<String> _donation_types = ['Zakat', 'Fitrana', 'Sadqa', 'Other'];
   int counter;
   String result;
+  bool done = false;
   void readData() {
     counter = 1;
     _donation_ref.once().then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value['Donations'];
-      if(values == null){
+      if (values == null) {
         print('No Other Types of Donations Added.');
-      }
-      else {
+      } else {
         print('Values: ' + values.toString());
         print('Key: ' + values.keys.toString());
         result = values.keys.toString().substring(
@@ -48,12 +53,13 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
         for (var key in values.values) {
           print(key);
           _donation_types = key['Donation Types'].cast<String>();
+          done = true;
           break;
         }
       }
     });
-  }
 
+  }
 
   @override
   void initState() {
@@ -61,7 +67,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
     Timer.periodic(const Duration(milliseconds: 1), (timer) {
       print('Loading...');
       print(_donation_types);
-      if (_donation_types[0] != null) {
+      if (done == true) {
         timer.cancel();
         print('Donations NOT NULL');
         setState(() {
@@ -79,198 +85,377 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
   Widget build(BuildContext context) {
     return _show
         ? Scaffold(
-       // resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.green[50],
-        appBar: AppBar(
-          backgroundColor: Colors.blueAccent[100],
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              InkWell(
-                onTap: () {
-                  if (_title.currentState.validate() &&
-                      _amount.currentState.validate()) {
-                    saveInfo();
-                    if (_other == true &&
-                        _other_donation.currentState.validate()) {
-                      Navigator.of(context).pop();
-                    } else if (_other == false) Navigator.of(context).pop();
-                  }
-                },
-                child: Text('POST',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Montserrat',
-                    )),
-              )
-            ],
-          ),
-        ),
-        body: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Form(
-                key: _title,
-                child: TextFormField(
-                  maxLength: 50,
-                  controller: _post_title,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return 'Required!';
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
-                    ),
-                    labelText: 'TITLE',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Montserrat',
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Form(
-                key: _amount,
-                child: TextFormField(
-                  keyboardType: TextInputType.number,
-                  controller: _post_amount,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return 'Required!';
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
-                    ),
-                    labelText: 'AMOUNT REQUIRED',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Montserrat',
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                maxLength: 150,
-                controller: _post_text,
-                decoration: InputDecoration(
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  labelText: 'DESCRIPTION',
-                  labelStyle: TextStyle(
-                    fontFamily: 'Montserrat',
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                dropdownColor: Colors.green[50],
-                isExpanded: true,
-                items: _donation_types.map((String dropDownItems) {
-                  return DropdownMenuItem<String>(
-                    value: dropDownItems,
-                    child: Text(dropDownItems,
+            // resizeToAvoidBottomInset: false,
+            backgroundColor: Colors.green[50],
+            appBar: AppBar(
+              backgroundColor: Colors.blueAccent[100],
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      if (_title.currentState.validate() &&
+                          _amount.currentState.validate() &&
+                          _description.currentState.validate()) {
+                        saveInfo();
+                        if (_other == true &&
+                            _other_donation.currentState.validate()) {
+                          Navigator.of(context).pop();
+                        } else if (_other == false) Navigator.of(context).pop();
+                      }
+                    },
+                    child: Text('POST',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w300,
                         )),
-                  );
-                }).toList(),
-                onChanged: (String newVal) {
-                  setState(() {
-                    _donation_selected = newVal;
-                    if (newVal == 'Other')
-                      _other = true;
-                    else
-                      _other = false;
-                  });
-                },
-                value: _donation_selected,
+                  )
+                ],
               ),
             ),
-            _other
-                ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Form(
-                key: _other_donation,
-                child: TextFormField(
-                  controller: _post_other_donation,
-                  validator: (value) {
-                    _donation_selected = value;
-                    if (value == null || value.isEmpty)
-                      return 'Required';
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
+            body: ListView(
+              children: [
+                _title_check
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              flex: 8,
+                              child: Form(
+                                key: _title,
+                                child: TextFormField(
+                                  maxLength: 50,
+                                  maxLines: 2,
+                                  controller: _post_title,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty)
+                                      return 'Required!';
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey),
+                                    ),
+                                    labelText: 'TITLE',
+                                    labelStyle: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                                flex: 2,
+                                child: TextButton(
+                                    onPressed: () {
+                                      if (_title.currentState.validate())
+                                        setState(() {
+                                          _title_check = false;
+                                        });
+                                    },
+                                    child: Image.asset(
+                                      'Images/check.png',
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.03,
+                                    )))
+                          ],
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'TITLE',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            InkWell(
+                                child: Text(
+                                  '\"' + _post_title.text + '\"',
+                                  style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.grey,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _title_check = true;
+                                  });
+                                }),
+                          ],
+                        ),
+                      ),
+                _amount_check
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              flex: 8,
+                              child: Form(
+                                key: _amount,
+                                child: TextFormField(
+                                  keyboardType: TextInputType.number,
+                                  controller: _post_amount,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty)
+                                      return 'Required!';
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey),
+                                    ),
+                                    labelText: 'AMOUNT REQUIRED',
+                                    labelStyle: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                                flex: 2,
+                                child: TextButton(
+                                    onPressed: () {
+                                      if (_amount.currentState.validate())
+                                        setState(() {
+                                          _amount_check = false;
+                                        });
+                                    },
+                                    child: Image.asset(
+                                      'Images/check.png',
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.03,
+                                    )))
+                          ],
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'AMOUNT REQUIRED',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            InkWell(
+                                child: Text(
+                                  'Rs.' + _post_amount.text + '/-',
+                                  style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.grey,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _amount_check = true;
+                                  });
+                                }),
+                          ],
+                        ),
+                      ),
+                _description_check
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              flex: 8,
+                              child: Form(
+                                key: _description,
+                                child: TextFormField(
+                                  maxLength: 200,
+                                  maxLines: 10,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty)
+                                      return 'Required!';
+                                    return null;
+                                  },
+                                  controller: _post_description,
+                                  decoration: InputDecoration(
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey),
+                                    ),
+                                    labelText: 'DESCRIPTION',
+                                    labelStyle: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                                flex: 2,
+                                child: TextButton(
+                                    onPressed: () {
+                                      if (_description.currentState.validate())
+                                        setState(() {
+                                          _description_check = false;
+                                        });
+                                    },
+                                    child: Image.asset(
+                                      'Images/check.png',
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.03,
+                                    )))
+                          ],
+                        ),
+                      )
+                    : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'DESCRIPTION',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            InkWell(
+                                child: Text(
+                                  '"' + _post_description.text + '"',
+                                  style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.grey,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _description_check = true;
+                                  });
+                                }),
+                          ],
+                        ),
                     ),
-                    labelText: 'DONATION TYPE',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Montserrat',
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButton<String>(
+                    dropdownColor: Colors.green[50],
+                    isExpanded: true,
+                    items: _donation_types.map((String dropDownItems) {
+                      return DropdownMenuItem<String>(
+                        value: dropDownItems,
+                        child: Text(dropDownItems,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w300,
+                            )),
+                      );
+                    }).toList(),
+                    onChanged: (String newVal) {
+                      setState(() {
+                        _donation_selected = newVal;
+                        print(newVal);
+                        if (newVal == 'Other')
+                          _other = true;
+                        else
+                          _other = false;
+                      });
+                    },
+                    value: _donation_selected,
                   ),
                 ),
-              ),
-            )
-                : SizedBox(
-              height: 0,
-            ),
-          ],
-        ))
+                _other
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Form(
+                          key: _other_donation,
+                          child: TextFormField(
+                            controller: _post_other_donation,
+                            validator: (value) {
+                              _donation_selected = value;
+                              if (value == null || value.isEmpty)
+                                return 'Required';
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                              labelText: 'DONATION TYPE',
+                              labelStyle: TextStyle(
+                                fontFamily: 'Montserrat',
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : SizedBox(
+                        height: 0,
+                      ),
+              ],
+            ))
         : Loading_Screen();
   }
 
   void saveInfo() async {
     String title = _post_title.text;
     String amount = _post_amount.text;
-    String description = _post_text.text;
+    String description = _post_description.text;
     String donation_type;
-    if(_other)
-      {
-        int counter = 0;
-        donation_type = _post_other_donation.text;
-        print(_donation_types);
-        print("Length: " + _donation_types.length.toString());
-        counter = _donation_types.length;
-        List newd = new List(counter+1);
-        var i = 0;
-        for(;i<counter;i++) {
-          if(_donation_types[i] == 'Other')
-            newd[i] = _post_other_donation.text;
-          else
-            newd[i] = _donation_types[i];
+    if (_other) {
+      int counter = 0;
+      donation_type = _post_other_donation.text;
+      print(_donation_types);
+      print("Length: " + _donation_types.length.toString());
+      counter = _donation_types.length;
+      List newd = new List(counter + 1);
+      var i = 0;
+      for (; i < counter; i++) {
+        if (_donation_types[i] == 'Other')
+          newd[i] = _post_other_donation.text;
+        else
+          newd[i] = _donation_types[i];
       }
       newd[i] = 'Other';
-        var d_types = {
-          'Donation Types' : newd
-        };
-        _donation_ref.child('Donations').remove();
-        _donation_ref.child('Donations').push().set(d_types);
-      }
-    else
+      var d_types = {'Donation Types': newd};
+      _donation_ref.child('Donations').remove();
+      _donation_ref.child('Donations').push().set(d_types);
+    } else
       donation_type = _donation_selected;
-    if (_post_text.text.isEmpty || _post_text == null) {
-      description = '(Not Available)';
-    }
+
     Map<String, String> info = {
       'Title': title,
       'Amount': amount,
