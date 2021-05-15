@@ -1,4 +1,5 @@
 //import 'dart:convert';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/interfaces/Home_Page.dart';
@@ -39,12 +40,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   TextEditingController _email = TextEditingController();
-
   TextEditingController _password = TextEditingController();
+  final _emailFill = GlobalKey<FormState>();
+  final _passwordFill = GlobalKey<FormState>();
   FirebaseAuth _auth = FirebaseAuth.instance;
-
+  DatabaseReference _ref = FirebaseDatabase.instance.reference();
+  Map _data;
   bool _obscureTextPass = true;
-
+  @override
   void _togglePass() {
     setState(() {
       _obscureTextPass = !_obscureTextPass;
@@ -53,16 +56,20 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final _emailFill = GlobalKey<FormState>();
-    final _passwordFill = GlobalKey<FormState>();
-    String error;
-
+    _ref.once().then((DataSnapshot snapshot) {
+      _data = snapshot.value['DataBase'];
+      for(var key in _data.values)
+        print(key['Email']);
+    });
+    Size _size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.green[50],
+      backgroundColor: Colors.grey[200],
       //resizeToAvoidBottomInset: false,
       body: ListView(children: [
         Stack(children: <Widget>[
           Container(
+            height: _size.height,
+            width: _size.width,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
@@ -116,7 +123,13 @@ class _HomeState extends State<Home> {
                       key: _emailFill,
                       child: TextFormField(
                         validator: (value) {
+                          bool found = false;
                           if (!value.contains("@")) return 'Invalid Email!';
+                          for(var key in _data.values)
+                            if(key['Email'] == value)
+                              found = true;
+                            if(!found)
+                              return 'Not SignedUp Yet!';
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
                           }
@@ -145,6 +158,12 @@ class _HomeState extends State<Home> {
                             key: _passwordFill,
                             child: TextFormField(
                               validator: (value) {
+                                bool found = false;
+                                for(var key in _data.values)
+                                  if(key['Password'] == value)
+                                    found = true;
+                                if(!found)
+                                  return 'Wrong Password!';
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter password';
                                 }
@@ -222,8 +241,10 @@ class _HomeState extends State<Home> {
                                         email: _email.text,
                                         password: _password.text)
                                     .then((_) {
+                                      bool _admin= false;
                                   if (_email.text == 'waseyu7119@gmail.com' &&
                                       _password.text == 'dC.l9h8J(\'')
+                                    _admin = true;
                                     Navigator.push(
                                         context,
                                         PageTransition(
@@ -231,16 +252,7 @@ class _HomeState extends State<Home> {
                                                 PageTransitionType.bottomToTop,
                                             duration:
                                                 Duration(milliseconds: 500),
-                                            child: Home_Page(true)));
-                                  else
-                                    Navigator.push(
-                                        context,
-                                        PageTransition(
-                                            type:
-                                                PageTransitionType.bottomToTop,
-                                            duration:
-                                                Duration(milliseconds: 500),
-                                            child: Home_Page(false)));
+                                            child: Home_Page(_admin)));
                                 }).catchError((e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'Delete_Post.dart';
 import 'Donate.dart';
 import 'Edit_Post.dart';
 
+
 class Home_Page extends StatefulWidget {
   bool _admin;
   Home_Page(this._admin, {Key, key}) : super(key: key);
@@ -24,33 +26,31 @@ class _Home_PageState extends State<Home_Page>
     with SingleTickerProviderStateMixin {
   bool isOpened = false;
   bool _is_home_page = false;
-  /*AnimationController _animationController;
-  Animation<Color> _buttonColor;
-  Animation<double> _animationIcon;
-  Animation<double> _translateButton;*/
-  Curve _curve = Curves.easeOut;
-  double _fabHeight = 56.0;
-  bool _colorHome = true;
-  bool _colorCharity = false;
-  bool _colorBloodDonations = false;
-  bool _colorAccountInfo = false;
   FirebaseAuth _auth = FirebaseAuth.instance;
   final databaseReference = FirebaseDatabase.instance.reference();
   Map info;
   Map _posts;
-  bool empty = false;
+  int _total_posts = -1;
+  int _new_posts = 0;
   bool edit_delete = false;
-  //List<Widget> Cards = NumberOfCards(total_posts);
   List<Widget> Cards = [
     SizedBox(
       height: 0,
     )
   ];
+  String result;
+  String entry;
+  int posts_loaded = 0;
+  bool posts_retrieved = false;
   List<Map> all_posts = [];
   void readData() {
+    setState(() {
+      _show = false;
+    });
+
+    final databaseReference = FirebaseDatabase.instance.reference();
     databaseReference.once().then((DataSnapshot snapshot) {
       // DATABASE USER INFORMATION
-
       Map<dynamic, dynamic> values = snapshot.value['DataBase'];
       for (var key in values.values) {
         if (key['Email'] == _auth.currentUser.email) {
@@ -59,170 +59,148 @@ class _Home_PageState extends State<Home_Page>
             'Email': key['Email'],
             'Date Of Birth': key['Date Of Birth'],
             'Age': key['Age'],
+            'Password' : key['Password'],
             'Phone Number': key['Phone Number'],
             'Blood Type': key['Blood Type'],
           };
+          setState(() {
+            _show = true;
+          });
           break;
         }
       }
-      //  DATABASE GATHER ALL POSTS
+    });
+  }
 
-      Cards = [
-        SizedBox(
-          height: 0,
-        )
-      ];
-      values = snapshot.value['Posts'];
+  //  DATABASE GATHER ALL POSTS
+
+  void readData_posts() {
+    setState(() {
+      _home_show = false;
+      posts_retrieved = false;
+      _total_posts = -1;
+      posts_loaded = 0;
+    });
+
+    Cards = [
+      SizedBox(
+        height: 0,
+      )
+    ];
+    final databaseReference = FirebaseDatabase.instance.reference();
+    databaseReference.once().then((DataSnapshot snapshot) {
+
+      Map<dynamic, dynamic> values = snapshot.value['Posts'];
+      all_posts = [];
+
       if (values == null) {
-        empty = true;
         print('No Post Made Yet');
+        databaseReference
+            .child('Posts')
+            .child('Total Posts')
+            .set({'Total Posts': 0});
+        setState(() {
+          _home_show = true;
+        });
+
       } else {
-        for (var key in values.values) {
-          _posts = {
-            'Title': key['Title'],
-            'Amount': key['Amount'],
-            'Description': key['Description'],
-            'Donation Type': key['Donation Type'],
-          };
-          all_posts.add(_posts);
-          Cards.add(Card(
-              elevation: 10,
-              margin: EdgeInsets.only(bottom: 10),
-              clipBehavior: Clip.antiAlias,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              color: Colors.grey[800],
-              shadowColor: Colors.orangeAccent,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Card(
+        databaseReference
+            .child('Posts')
+            .child('Total Posts')
+            .once()
+            .then((DataSnapshot snapshot) {
+              setState(() {
+                _total_posts = snapshot.value['Total Posts'];
+              });
+          print('Total Posts: ' + _total_posts.toString());
+        }).then((_){
+          for (var key in values.values) {
+            if(key['Total Posts'] == null) {
+              print(key['Total Posts']);
+              _posts = {
+                'Title': key['Title'],
+                'Amount': key['Amount'],
+                'Description': key['Description'],
+                'Donation Type': key['Donation Type'],
+              };
+              print("POST NUMBER: " + _total_posts.toString());
+              setState(() {
+                posts_loaded++;
+                all_posts.add(_posts);
+                Cards.add(Card(
                     elevation: 10,
                     margin: EdgeInsets.only(bottom: 10),
                     clipBehavior: Clip.antiAlias,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    color: Colors.orange,
+                    color: Colors.grey[800],
                     shadowColor: Colors.orangeAccent,
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              _posts['Title'],
-                              overflow: TextOverflow.clip,  
-                              style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontSize: 20,
-                                color: Colors.white,
-                              ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Card(
+                          elevation: 10,
+                          margin: EdgeInsets.only(bottom: 10),
+                          clipBehavior: Clip.antiAlias,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          color: Colors.orange,
+                          shadowColor: Colors.orangeAccent,
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    _posts['Title'],
+                                    overflow: TextOverflow.clip,
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  'Rs. ${_posts['Amount']}/-',
+                                  overflow: TextOverflow.clip,
+                                  style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              ],
                             ),
                           ),
-                          Text(
-                            'Rs. ${_posts['Amount']}/-',
-                            overflow: TextOverflow.clip,
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'DESCRIPTION: ',
                             style: TextStyle(
                               fontFamily: 'Montserrat',
-                              fontSize: 20,
                               color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'DESCRIPTION: ',
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text(
-                      _posts['Description'],
-                      overflow: TextOverflow.clip,
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 15,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'DONATION TYPE: ',
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         SizedBox(
                           width: 20,
                         ),
-                        Text(
-                          _posts['Donation Type'],
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontSize: 15,
-                            color: Colors.white,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          print('Pressed');
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                type: PageTransitionType.bottomToTop,
-                                duration: Duration(milliseconds: 500),
-                                child: Donate(),
-                              ));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.green,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
                           child: Text(
-                            'DONATE',
+                            _posts['Description'],
+                            overflow: TextOverflow.clip,
                             style: TextStyle(
                               fontFamily: 'Montserrat',
                               fontSize: 15,
@@ -230,19 +208,97 @@ class _Home_PageState extends State<Home_Page>
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ],
-              )));
-        }
+                        SizedBox(
+                          height: 8,
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                'DONATION TYPE: ',
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                _posts['Donation Type'],
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 15,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 25,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                print('Pressed');
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.bottomToTop,
+                                      duration: Duration(milliseconds: 500),
+                                      child: Donate(),
+                                    ));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.green,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'DONATE',
+                                  style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 15,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 15,
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                      ],
+                    )));
+              });
+              print("Posts Loaded: " + posts_loaded.toString());
+              if (posts_loaded == _total_posts) {
+                setState(() {
+                  posts_retrieved = true;
+                  _home_show = true;
+                });
+
+                break;
+              }
+            }
+          }
+        });
+
       }
+
     });
   }
 
@@ -251,27 +307,15 @@ class _Home_PageState extends State<Home_Page>
     setState(() {
       _selectedIndex = index;
       if (index == 0) {
-        _show = false;
-        _home_show = false;
-        Timer.periodic(const Duration(milliseconds: 1), (timer) {
-          readData();
-          if (info != null) {
-            print('INFO NOT NULL');
-            if (empty)
-              print('POSTS ARE EMPTY');
-            else if (_posts != null) print('POSTS NOT NULL');
-            timer.cancel();
-
-            setState(() {
-              _show = true;
-              _home_show = true;
-            });
-          }
-        });
+        if(_total_posts != 0)
+          readData_posts();
       }
     });
   }
 
+  bool _show = false;
+  bool _home_show = false;
+  bool done = false;
   TextEditingController name = TextEditingController();
   TextEditingController bloodType = TextEditingController();
   TextEditingController age = TextEditingController();
@@ -283,7 +327,6 @@ class _Home_PageState extends State<Home_Page>
   bool editBloodType = false;
   bool editAge = false;
   final bloodGroups = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
-  User _user;
   List<String> _days = ['1'];
   var _currentDay = DateTime.now().day.toString();
   List<String> _months;
@@ -292,6 +335,7 @@ class _Home_PageState extends State<Home_Page>
   var _currentYear = DateTime.now().year.toString();
   DateTime _date;
   var _monthMap;
+  User _user;
   String age_calculator(int day, int month, int year) {
     int currentDay = DateTime.now().day;
     int currentMonth = DateTime.now().month;
@@ -314,23 +358,8 @@ class _Home_PageState extends State<Home_Page>
   @override
   void initState() {
     // TODO: implement initState
-    /*_animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 250))
-          ..addListener(() {
-            setState(() {});
-          });
-    _animationIcon =
-        Tween<double>(begin: 0, end: 1).animate(_animationController);
-    _buttonColor = ColorTween(begin: Colors.blueAccent, end: Colors.red)
-        .animate(CurvedAnimation(
-            parent: _animationController,
-            curve: Interval(0, 1, curve: Curves.linear)));
-    _translateButton = Tween<double>(
-      begin: _fabHeight,
-      end: -14,
-    ).animate(CurvedAnimation(
-        parent: _animationController, curve: Interval(0, 0.75, curve: _curve)));*/
     super.initState();
+    readData();
     _date = DateTime.now();
     _currentMonth = DateFormat('MMMM').format(_date);
     for (int i = 1; i < 31; i++) {
@@ -369,69 +398,37 @@ class _Home_PageState extends State<Home_Page>
       _years.add((i + 1).toString());
     }
     _user = _auth.currentUser;
-    Timer.periodic(const Duration(milliseconds: 1), (timer) {
-      _show = false;
-      _home_show = false;
-      readData();
-      if (info != null) {
-        print('INFO NOT NULL');
-        if (empty)
-          print('POSTS ARE EMPTY');
-        else if (_posts != null) print('POSTS NOT NULL');
-        timer.cancel();
-
-        setState(() {
-          _show = true;
-          _home_show = true;
-        });
-      }
-    });
   }
 
 
-  /*animate() {
-    // setState(() {
-    if (!isOpened)
-      _animationController.forward();
-    else
-      _animationController.reverse();
-    isOpened = !isOpened;
-    //  });
-  }*/
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-   // _animationController.dispose();
-    super.dispose();
-  }
-
-  bool _show = false;
-  bool _home_show = false;
-  bool done = false;
   @override
   Widget build(BuildContext context) {
-    if (!done) {
-      Timer.periodic(const Duration(milliseconds: 3), (timer) {
-        _show = false;
-        _home_show = false;
-        readData();
-        if (info != null) {
-          print('INFO NOT NULL');
-          if (empty)
-            print('POSTS ARE EMPTY');
-          else if (_posts != null) print('POSTS NOT NULL');
-          timer.cancel();
+    // This constantly checks whether if posts are edited or deleted
+    databaseReference
+        .child('Posts')
+        .child('Total Posts')
+        .once()
+        .then((DataSnapshot snapshot) {
+      setState(() {
+        if(snapshot.value == null)
           setState(() {
-            _show = true;
-            _home_show = true;
-            done = true;
+            _total_posts = -1;
+            posts_retrieved = false;
           });
-        }
+        else
+        _total_posts = snapshot.value['Total Posts'];
       });
+    });
+    if(_total_posts == 0) {
+      setState(() {
+        _home_show = true;
+      });
+    } else if(!posts_retrieved) {
+      posts_loaded = 0;
+      print('asdasd');
+      readData_posts();
     }
-    child:
-    Text(widget._admin.toString());
+
     Size _size = MediaQuery.of(context).size;
     List _widgetOptions = [
       _home_show
@@ -449,10 +446,10 @@ class _Home_PageState extends State<Home_Page>
                               PageTransition(
                                 type: PageTransitionType.bottomToTop,
                                 duration: Duration(milliseconds: 500),
-                                child: Post_Info(all_posts[index]),
+                                child: Post_Info(all_posts[index -
+                                    1]), // index - 1 because I added a SizedBox of height 0 as a starter of the List
                               ));
-                          setState(() {
-                          });
+                          setState(() {});
                         },
                         child: Cards.elementAt(index));
                   },
@@ -979,14 +976,34 @@ class _Home_PageState extends State<Home_Page>
             opacity: widget._admin && _is_home_page ? 1 : 0,
             child: FloatingActionButton(
               heroTag: "Add Post",
-              onPressed: () {
+              onPressed: () async {
                 Navigator.push(
                     context,
                     PageTransition(
                       type: PageTransitionType.bottomToTop,
                       duration: Duration(milliseconds: 500),
-                      child: Create_Post_v2(empty),
-                    ));
+                      child: Create_Post_v2(),
+                    )).then((_) {
+                  int counter = -1;
+                  databaseReference.once().then((DataSnapshot snapshot) {
+                    Map<dynamic, dynamic> values = snapshot.value['Posts'];
+                    print('Inside');
+                    for(var key in values.values) {
+                      counter++;
+                      print("Counter: " + counter.toString());
+                    }
+                  }).then((_) {
+                    if(_total_posts < counter)
+                      setState(() {
+                        posts_retrieved = false;
+                        _total_posts = counter;
+                      });
+                    databaseReference.child('Posts').child('Total Posts').update({
+                      'Total Posts': counter,
+                    });
+                });
+
+    });
               },
               tooltip: 'Add',
               child: Image.asset(

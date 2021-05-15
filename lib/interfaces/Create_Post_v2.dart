@@ -8,8 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class Create_Post_v2 extends StatefulWidget {
-  bool empty;
-  Create_Post_v2(this.empty, {Key, key}) : super(key: key);
   @override
   _Create_Post_v2State createState() => _Create_Post_v2State();
 }
@@ -64,7 +62,7 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
   @override
   void initState() {
     // TODO: implement initState
-    Timer.periodic(const Duration(milliseconds: 1), (timer) {
+    Timer.periodic(const Duration(milliseconds: 500), (timer) {
       print('Loading...');
       print(_donation_types);
       if (done == true) {

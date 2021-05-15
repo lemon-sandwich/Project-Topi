@@ -110,7 +110,7 @@ class _LoginWithFacebookState extends State<LoginWithFacebook> {
           Navigator.push(
               context,
               PageTransition(
-                  child: Home_Page(true))
+                  child: Home_Page(false))
           );
         });
 

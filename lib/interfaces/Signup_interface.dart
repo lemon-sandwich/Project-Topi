@@ -144,8 +144,11 @@ class _Signup_interfaceState extends State<Signup_interface> {
                       key: _fullNameFill,
                       child: TextFormField(
                         validator: (value){
+                          final  validCharacters = RegExp(r'^[a-zA-Z ]+$');
                           if(value.isEmpty || value == null)
                             return 'Please enter some text!';
+                          if(!validCharacters.hasMatch(value))
+                              return 'Full Name can only contain alphabetic characters!';
                           return null;
                         },
                         controller: _fullName,
@@ -420,22 +423,21 @@ class _Signup_interfaceState extends State<Signup_interface> {
                             child: InkWell(
 
                               onTap: (){
-                                if (_emailFill.currentState.validate() &&
+                                if (_fullNameFill.currentState.validate() && _emailFill.currentState.validate() &&
                                     _passwordFill.currentState.validate() && _rePassFill.currentState.validate()
-                                && _phoneNumberFill.currentState.validate() && _fullNameFill.currentState.validate()) {
-                                  saveInfo();
-                                  _auth
-                                      .createUserWithEmailAndPassword(
-                                      email: _email.text,
-                                      password: _password.text)
-                                      .then((_) {
+                                && _phoneNumberFill.currentState.validate()) {
                                     Navigator.push(
                                         context,
                                         PageTransition(
                                             type: PageTransitionType.bottomToTop,
                                             duration: Duration(milliseconds: 500),
-                                            child: VerifyEmail()));
-                                  });
+                                            child: VerifyEmail())).then((_) {
+                                      saveInfo();
+                                      _auth
+                                          .createUserWithEmailAndPassword(
+                                          email: _email.text,
+                                          password: _password.text);
+                                    });
                                 }
 
                               },
@@ -459,6 +461,7 @@ class _Signup_interfaceState extends State<Signup_interface> {
 
   void saveInfo() async{
     String name = _fullName.text;
+    String password = _password.text;
     String email = _email.text;
     String dob = _currentDay + ' ' + _currentMonth + ',' + _currentYear;
     String bloodType = currentbgrp;
@@ -466,13 +469,14 @@ class _Signup_interfaceState extends State<Signup_interface> {
     String phoneNumber = _phoneNumber.text;
     Map<String, String> info = {
       'Name': name,
+      'Password': password,
       'Email': email,
       'Date Of Birth': dob,
       'Age': age,
       'Blood Type': bloodType,
       'Phone Number': '+92' + phoneNumber,
     };
-    _ref.push().set(info);
+    _ref.child(name).set(info);
   }
 
 }
