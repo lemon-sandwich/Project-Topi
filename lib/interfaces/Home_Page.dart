@@ -8,12 +8,8 @@ import 'package:flutter_app/interfaces/Loading_Screen.dart';
 import 'package:flutter_app/interfaces/Post_Info.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
-
 import 'Create_Post_v2.dart';
-import 'Delete_Post.dart';
 import 'Donate.dart';
-import 'Edit_Post.dart';
-
 
 class Home_Page extends StatefulWidget {
   bool _admin;
@@ -59,7 +55,7 @@ class _Home_PageState extends State<Home_Page>
             'Email': key['Email'],
             'Date Of Birth': key['Date Of Birth'],
             'Age': key['Age'],
-            'Password' : key['Password'],
+            'Password': key['Password'],
             'Phone Number': key['Phone Number'],
             'Blood Type': key['Blood Type'],
           };
@@ -73,23 +69,23 @@ class _Home_PageState extends State<Home_Page>
   }
 
   //  DATABASE GATHER ALL POSTS
-
+  bool _changes_made = false;
   void readData_posts() {
     setState(() {
       _home_show = false;
       posts_retrieved = false;
+      _changes_made = false;
       _total_posts = -1;
       posts_loaded = 0;
+      Cards = [
+        SizedBox(
+          height: 0,
+        )
+      ];
     });
 
-    Cards = [
-      SizedBox(
-        height: 0,
-      )
-    ];
     final databaseReference = FirebaseDatabase.instance.reference();
     databaseReference.once().then((DataSnapshot snapshot) {
-
       Map<dynamic, dynamic> values = snapshot.value['Posts'];
       all_posts = [];
 
@@ -102,203 +98,215 @@ class _Home_PageState extends State<Home_Page>
         setState(() {
           _home_show = true;
         });
-
       } else {
         databaseReference
             .child('Posts')
             .child('Total Posts')
             .once()
             .then((DataSnapshot snapshot) {
-              setState(() {
-                _total_posts = snapshot.value['Total Posts'];
-              });
-          print('Total Posts: ' + _total_posts.toString());
-        }).then((_){
-          for (var key in values.values) {
-            if(key['Total Posts'] == null) {
-              print(key['Total Posts']);
-              _posts = {
-                'Title': key['Title'],
-                'Amount': key['Amount'],
-                'Description': key['Description'],
-                'Donation Type': key['Donation Type'],
-              };
-              print("POST NUMBER: " + _total_posts.toString());
-              setState(() {
-                posts_loaded++;
-                all_posts.add(_posts);
-                Cards.add(Card(
-                    elevation: 10,
-                    margin: EdgeInsets.only(bottom: 10),
-                    clipBehavior: Clip.antiAlias,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    color: Colors.grey[800],
-                    shadowColor: Colors.orangeAccent,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Card(
-                          elevation: 10,
-                          margin: EdgeInsets.only(bottom: 10),
-                          clipBehavior: Clip.antiAlias,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          color: Colors.orange,
-                          shadowColor: Colors.orangeAccent,
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    _posts['Title'],
+          setState(() {
+            _total_posts = snapshot.value['Total Posts'];
+            print('Total Posts: ' + _total_posts.toString());
+          });
+        }).then((_) {
+          if(_total_posts !=0) {
+            for (var key in values.values) {
+              if (key['Total Posts'] == null) {
+                var reversed = Map.fromEntries(values.entries
+                    .map((e) => MapEntry(e.value, e.key))); // To get the hash
+                _posts = {
+                  'Title': key['Title'],
+                  'Amount': key['Amount'],
+                  'Description': key['Description'],
+                  'Donation Type': key['Donation Type'],
+                  'Hash': reversed[key],
+                };
+                setState(() {
+                  posts_loaded++;
+                  all_posts.add(_posts);
+                  Cards.add(Card(
+                      elevation: 10,
+                      margin: EdgeInsets.only(bottom: 10),
+                      clipBehavior: Clip.antiAlias,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      color: Colors.grey[800],
+                      shadowColor: Colors.orangeAccent,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Card(
+                            elevation: 10,
+                            margin: EdgeInsets.only(bottom: 10),
+                            clipBehavior: Clip.antiAlias,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            color: Colors.orange,
+                            shadowColor: Colors.orangeAccent,
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      _posts['Title'],
+                                      overflow: TextOverflow.clip,
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Rs. ${_posts['Amount']}/-',
                                     overflow: TextOverflow.clip,
                                     style: TextStyle(
                                       fontFamily: 'Montserrat',
                                       fontSize: 20,
                                       color: Colors.white,
                                     ),
-                                  ),
-                                ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'DESCRIPTION: ',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Text(
+                              _posts['Description'],
+                              overflow: TextOverflow.clip,
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 15,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
                                 Text(
-                                  'Rs. ${_posts['Amount']}/-',
-                                  overflow: TextOverflow.clip,
+                                  'DONATION TYPE: ',
                                   style: TextStyle(
                                     fontFamily: 'Montserrat',
-                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Text(
+                                  _posts['Donation Type'],
+                                  style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 15,
                                     color: Colors.white,
                                   ),
                                 )
                               ],
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'DESCRIPTION: ',
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          SizedBox(
+                            height: 25,
                           ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Text(
-                            _posts['Description'],
-                            overflow: TextOverflow.clip,
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 15,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text(
-                                'DONATION TYPE: ',
-                                style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                              ElevatedButton(
+                                onPressed: () {
+                                  print('Pressed');
+                                  Navigator.push(
+                                      context,
+                                      PageTransition(
+                                        type: PageTransitionType.bottomToTop,
+                                        duration: Duration(milliseconds: 500),
+                                        child: Donate(),
+                                      ));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.green,
                                 ),
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Text(
-                                _posts['Donation Type'],
-                                style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 25,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                print('Pressed');
-                                Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      type: PageTransitionType.bottomToTop,
-                                      duration: Duration(milliseconds: 500),
-                                      child: Donate(),
-                                    ));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.green,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  'DONATE',
-                                  style: TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    fontSize: 15,
-                                    color: Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'DONATE',
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              width: 15,
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                      ],
-                    )));
-              });
-              print("Posts Loaded: " + posts_loaded.toString());
-              if (posts_loaded == _total_posts) {
+                              SizedBox(
+                                width: 15,
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      )));
+                  print("Posts Loaded: " + posts_loaded.toString());
+                  if (posts_loaded == _total_posts) {
+                    print('Posts loaded = Total posts');
+                    posts_retrieved = true;
+                    _home_show = true;
+                  }
+                });
+              }
+              if (posts_retrieved) {
                 setState(() {
-                  posts_retrieved = true;
-                  _home_show = true;
+                  _changes_made = false;
                 });
 
                 break;
               }
             }
           }
+          else
+            {
+              setState(() {
+                _home_show = true;
+                _changes_made = false;
+              });
+            }
         });
-
       }
-
     });
   }
 
@@ -306,9 +314,9 @@ class _Home_PageState extends State<Home_Page>
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      if (index == 0) {
-        if(_total_posts != 0)
-          readData_posts();
+      if(index == 0) {
+        _changes_made = false;
+        readData_posts();
       }
     });
   }
@@ -360,6 +368,7 @@ class _Home_PageState extends State<Home_Page>
     // TODO: implement initState
     super.initState();
     readData();
+    readData_posts();
     _date = DateTime.now();
     _currentMonth = DateFormat('MMMM').format(_date);
     for (int i = 1; i < 31; i++) {
@@ -400,34 +409,10 @@ class _Home_PageState extends State<Home_Page>
     _user = _auth.currentUser;
   }
 
-
   @override
   Widget build(BuildContext context) {
-    // This constantly checks whether if posts are edited or deleted
-    databaseReference
-        .child('Posts')
-        .child('Total Posts')
-        .once()
-        .then((DataSnapshot snapshot) {
-      setState(() {
-        if(snapshot.value == null)
-          setState(() {
-            _total_posts = -1;
-            posts_retrieved = false;
-          });
-        else
-        _total_posts = snapshot.value['Total Posts'];
-      });
-    });
-    if(_total_posts == 0) {
-      setState(() {
-        _home_show = true;
-      });
-    } else if(!posts_retrieved) {
-      posts_loaded = 0;
-      print('asdasd');
+    if(_changes_made)
       readData_posts();
-    }
 
     Size _size = MediaQuery.of(context).size;
     List _widgetOptions = [
@@ -444,12 +429,15 @@ class _Home_PageState extends State<Home_Page>
                           Navigator.push(
                               context,
                               PageTransition(
-                                type: PageTransitionType.bottomToTop,
+                                type: PageTransitionType.fade,
                                 duration: Duration(milliseconds: 500),
                                 child: Post_Info(all_posts[index -
                                     1]), // index - 1 because I added a SizedBox of height 0 as a starter of the List
-                              ));
-                          setState(() {});
+                              )).then((_) {
+                            setState(() {
+                              _changes_made = true;
+                            });
+                          });
                         },
                         child: Cards.elementAt(index));
                   },
@@ -977,7 +965,7 @@ class _Home_PageState extends State<Home_Page>
             child: FloatingActionButton(
               heroTag: "Add Post",
               onPressed: () async {
-                Navigator.push(
+                await Navigator.push(
                     context,
                     PageTransition(
                       type: PageTransitionType.bottomToTop,
@@ -987,23 +975,24 @@ class _Home_PageState extends State<Home_Page>
                   int counter = -1;
                   databaseReference.once().then((DataSnapshot snapshot) {
                     Map<dynamic, dynamic> values = snapshot.value['Posts'];
-                    print('Inside');
-                    for(var key in values.values) {
+                    for (var key in values.values) {
                       counter++;
-                      print("Counter: " + counter.toString());
                     }
                   }).then((_) {
-                    if(_total_posts < counter)
+                    if (_total_posts < counter)
                       setState(() {
                         posts_retrieved = false;
+                        _changes_made = true;
                         _total_posts = counter;
                       });
-                    databaseReference.child('Posts').child('Total Posts').update({
+                    databaseReference
+                        .child('Posts')
+                        .child('Total Posts')
+                        .update({
                       'Total Posts': counter,
                     });
+                  });
                 });
-
-    });
               },
               tooltip: 'Add',
               child: Image.asset(

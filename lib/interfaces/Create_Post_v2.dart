@@ -84,9 +84,8 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
     return _show
         ? Scaffold(
             // resizeToAvoidBottomInset: false,
-            backgroundColor: Colors.green[50],
             appBar: AppBar(
-              backgroundColor: Colors.blueAccent[100],
+              backgroundColor: Colors.orange,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -113,257 +112,89 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
             ),
             body: ListView(
               children: [
-                _title_check
-                    ? Padding(
+                Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              flex: 8,
-                              child: Form(
-                                key: _title,
-                                child: TextFormField(
-                                  maxLength: 50,
-                                  maxLines: 2,
-                                  controller: _post_title,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty)
-                                      return 'Required!';
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey),
-                                    ),
-                                    labelText: 'TITLE',
-                                    labelStyle: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
+                        child: Form(
+                          key: _title,
+                          child: TextFormField(
+                            maxLength: 50,
+                            maxLines: 2,
+                            controller: _post_title,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'Required!';
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey),
                               ),
-                            ),
-                            Flexible(
-                                flex: 2,
-                                child: TextButton(
-                                    onPressed: () {
-                                      if (_title.currentState.validate())
-                                        setState(() {
-                                          _title_check = false;
-                                        });
-                                    },
-                                    child: Image.asset(
-                                      'Images/check.png',
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.03,
-                                    )))
-                          ],
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'TITLE',
-                              style: TextStyle(
+                              labelText: 'TITLE',
+                              labelStyle: TextStyle(
                                 fontFamily: 'Montserrat',
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            InkWell(
-                                child: Text(
-                                  '\"' + _post_title.text + '\"',
-                                  style: TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    color: Colors.grey,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                onTap: () {
-                                  setState(() {
-                                    _title_check = true;
-                                  });
-                                }),
-                          ],
+                          ),
                         ),
                       ),
-                _amount_check
-                    ? Padding(
+                Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              flex: 8,
-                              child: Form(
-                                key: _amount,
-                                child: TextFormField(
-                                  keyboardType: TextInputType.number,
-                                  controller: _post_amount,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty)
-                                      return 'Required!';
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey),
-                                    ),
-                                    labelText: 'AMOUNT REQUIRED',
-                                    labelStyle: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
+                        child: Form(
+                          key: _amount,
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: _post_amount,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'Required!';
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey),
                               ),
-                            ),
-                            Flexible(
-                                flex: 2,
-                                child: TextButton(
-                                    onPressed: () {
-                                      if (_amount.currentState.validate())
-                                        setState(() {
-                                          _amount_check = false;
-                                        });
-                                    },
-                                    child: Image.asset(
-                                      'Images/check.png',
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.03,
-                                    )))
-                          ],
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'AMOUNT REQUIRED',
-                              style: TextStyle(
+                              labelText: 'AMOUNT REQUIRED',
+                              labelStyle: TextStyle(
                                 fontFamily: 'Montserrat',
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            InkWell(
-                                child: Text(
-                                  'Rs.' + _post_amount.text + '/-',
-                                  style: TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    color: Colors.grey,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                onTap: () {
-                                  setState(() {
-                                    _amount_check = true;
-                                  });
-                                }),
-                          ],
+                          ),
                         ),
                       ),
-                _description_check
-                    ? Padding(
+                Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              flex: 8,
-                              child: Form(
-                                key: _description,
-                                child: TextFormField(
-                                  maxLength: 200,
-                                  maxLines: 10,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty)
-                                      return 'Required!';
-                                    return null;
-                                  },
-                                  controller: _post_description,
-                                  decoration: InputDecoration(
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey),
-                                    ),
-                                    labelText: 'DESCRIPTION',
-                                    labelStyle: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
+                        child: Form(
+                          key: _description,
+                          child: TextFormField(
+                            maxLength: 200,
+                            maxLines: 10,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'Required!';
+                              return null;
+                            },
+                            controller: _post_description,
+                            decoration: InputDecoration(
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey),
                               ),
-                            ),
-                            Flexible(
-                                flex: 2,
-                                child: TextButton(
-                                    onPressed: () {
-                                      if (_description.currentState.validate())
-                                        setState(() {
-                                          _description_check = false;
-                                        });
-                                    },
-                                    child: Image.asset(
-                                      'Images/check.png',
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.03,
-                                    )))
-                          ],
-                        ),
-                      )
-                    : Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'DESCRIPTION',
-                              style: TextStyle(
+                              labelText: 'DESCRIPTION',
+                              labelStyle: TextStyle(
                                 fontFamily: 'Montserrat',
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            InkWell(
-                                child: Text(
-                                  '"' + _post_description.text + '"',
-                                  style: TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    color: Colors.grey,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                onTap: () {
-                                  setState(() {
-                                    _description_check = true;
-                                  });
-                                }),
-                          ],
+                          ),
                         ),
-                    ),
+                      ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: DropdownButton<String>(
