@@ -1,5 +1,6 @@
 //import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/interfaces/Home_Page.dart';
@@ -11,9 +12,16 @@ import 'package:page_transition/page_transition.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+
+  print("Handling a background message: ${message.messageId}");
+}
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   //  The WidgetFlutterBinding is used to interact with the Flutter engine.
   // Firebase.initializeApp() needs to call native code to initialize Firebase,
   // and since the plugin needs to use platform channels to call the native code,
@@ -34,11 +42,43 @@ void main() async {
 }
 
 class Home extends StatefulWidget {
+
   @override
   _HomeState createState() => _HomeState();
+
 }
 
 class _HomeState extends State<Home> {
+  Future<void> Messaging() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await FirebaseMessaging.instance.subscribeToTopic('BloodDonations');
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    String token = await messaging.getToken(
+      vapidKey:
+      "eHQGWU1lR0Wg3nHREIycqo:APA91bENbRGQ8qz6--GZ6eV_3h61aWKbQojomZn7ySJWE9m-z0SRRyiVGovrZR0MvainBth82QySlF-5a7E5r8akfHe8LJdRXQO1iR4m9BAQvhxhet17K4T_eLD-M8gQBktYp67FnEaG",
+    );
+    print('User granted permission: ${settings.authorizationStatus}');
+  }
+  void push_notifications() {
+    setState(() {
+      fill = false;
+    });
+
+    DatabaseReference _ref =
+    FirebaseDatabase.instance.reference().child('Notifications');
+    _ref.push().set({
+      'Title': _msg_title,
+      'Body': _msg_body,
+    });
+  }
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
   final _emailFill = GlobalKey<FormState>();
@@ -53,9 +93,42 @@ class _HomeState extends State<Home> {
       _obscureTextPass = !_obscureTextPass;
     });
   }
-
+  bool fill = false;
+  String _msg_title,_msg_body;
+  @override
+  void initState() {
+    // TODO: implement initState
+    Messaging();
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      print("message recieved");
+      _msg_title = event.notification.title;
+      _msg_body = event.notification.body;
+      setState(() {
+        fill = true;
+      });
+      print(event.notification.body);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(event.notification.title),
+                content: Text(event.notification.body),
+                actions: [
+                  TextButton(
+                    child: Text("Check"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+    if(fill) push_notifications();
     _ref.once().then((DataSnapshot snapshot) {
       _data = snapshot.value['DataBase'];
       for(var key in _data.values)
@@ -137,7 +210,6 @@ class _HomeState extends State<Home> {
                         },
                         controller: _email,
                         decoration: InputDecoration(
-                          hintText: 'Someone@example.com',
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),

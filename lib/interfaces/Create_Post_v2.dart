@@ -198,7 +198,6 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: DropdownButton<String>(
-                    dropdownColor: Colors.green[50],
                     isExpanded: true,
                     items: _donation_types.map((String dropDownItems) {
                       return DropdownMenuItem<String>(

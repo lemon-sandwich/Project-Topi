@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'Create_Post_v2.dart';
 import 'Donate.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Home_Page extends StatefulWidget {
   bool _admin;
@@ -20,15 +21,40 @@ class Home_Page extends StatefulWidget {
 
 class _Home_PageState extends State<Home_Page>
     with SingleTickerProviderStateMixin {
+  /*Future<void> Messaging() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await FirebaseMessaging.instance.subscribeToTopic('BloodDonations');
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    String token = await messaging.getToken(
+      vapidKey:
+          "eHQGWU1lR0Wg3nHREIycqo:APA91bENbRGQ8qz6--GZ6eV_3h61aWKbQojomZn7ySJWE9m-z0SRRyiVGovrZR0MvainBth82QySlF-5a7E5r8akfHe8LJdRXQO1iR4m9BAQvhxhet17K4T_eLD-M8gQBktYp67FnEaG",
+    );
+    print('User granted permission: ${settings.authorizationStatus}');
+  }*/
+
   bool isOpened = false;
   bool _is_home_page = false;
   FirebaseAuth _auth = FirebaseAuth.instance;
   final databaseReference = FirebaseDatabase.instance.reference();
   Map info;
   Map _posts;
+  Map notifications;
   int _total_posts = -1;
   int _new_posts = 0;
   bool edit_delete = false;
+  List<Widget> Notif_Cards = [
+    SizedBox(
+      height: 0,
+    )
+  ];
   List<Widget> Cards = [
     SizedBox(
       height: 0,
@@ -39,6 +65,7 @@ class _Home_PageState extends State<Home_Page>
   int posts_loaded = 0;
   bool posts_retrieved = false;
   List<Map> all_posts = [];
+  List<Map> all_notifications = [];
   void readData() {
     setState(() {
       _show = false;
@@ -83,7 +110,6 @@ class _Home_PageState extends State<Home_Page>
         )
       ];
     });
-
     final databaseReference = FirebaseDatabase.instance.reference();
     databaseReference.once().then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value['Posts'];
@@ -109,7 +135,7 @@ class _Home_PageState extends State<Home_Page>
             print('Total Posts: ' + _total_posts.toString());
           });
         }).then((_) {
-          if(_total_posts !=0) {
+          if (_total_posts != 0) {
             for (var key in values.values) {
               if (key['Total Posts'] == null) {
                 var reversed = Map.fromEntries(values.entries
@@ -297,24 +323,118 @@ class _Home_PageState extends State<Home_Page>
                 break;
               }
             }
+          } else {
+            setState(() {
+              _home_show = true;
+              _changes_made = false;
+            });
           }
-          else
-            {
-              setState(() {
-                _home_show = true;
-                _changes_made = false;
-              });
-            }
         });
       }
     });
   }
 
+  bool notifs = false;
+  bool fill = false;
+  int _card_counter = 0;
+  void readData_notifications() {
+    setState(() {
+      notifs = false;
+      _card_counter = 0;
+      Notif_Cards = [
+        SizedBox(
+          height: 0,
+        )
+      ];
+    });
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    databaseReference.once().then((DataSnapshot snapshot) {
+      // DATABASE USER INFORMATION
+      Map<dynamic, dynamic> values = snapshot.value['Notifications'];
+      if(values == null);
+      else
+      for (var key in values.values) {
+        notifications = {
+          'Title': key['Title'],
+          'Body': key['Body'],
+        };
+        all_notifications.add(notifications);
+        print(notifications);
+        Notif_Cards.add(
+            Card(
+                elevation: 7,
+                margin: EdgeInsets.only(bottom: 10),
+                clipBehavior: Clip.antiAlias,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                color: Colors.grey[800],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0,8,8,0),
+                      child: Row(
+                        children: [
+                          Image.asset('Images/ProjectTopi.png',height: MediaQuery.of(context).size.height*0.04,
+                            width: MediaQuery.of(context).size.width*0.04,),
+                          SizedBox(width: 10,),
+                          Text(
+                            '${notifications['Title']}',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20,0,20,5),
+                      child: Text(
+                        notifications['Body'],
+                        overflow: TextOverflow.clip,
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 15,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ))
+        );
+        _card_counter++;
+      }
+      setState(() {
+        notifs = true;
+      });
+    });
+  }
+
+  void push_notifications() {
+    setState(() {
+      fill = false;
+    });
+    DatabaseReference _ref =
+    FirebaseDatabase.instance.reference().child('Notifications');
+      _ref.push().set({
+        'Title': _msg_title,
+        'Body': _msg_body,
+      });
+      readData_notifications();
+  }
   int _selectedIndex = 0;
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      if(index == 0) {
+      if (index == 0) {
         _changes_made = false;
         readData_posts();
       }
@@ -344,6 +464,7 @@ class _Home_PageState extends State<Home_Page>
   DateTime _date;
   var _monthMap;
   User _user;
+  String _msg_title, _msg_body;
   String age_calculator(int day, int month, int year) {
     int currentDay = DateTime.now().day;
     int currentMonth = DateTime.now().month;
@@ -362,11 +483,41 @@ class _Home_PageState extends State<Home_Page>
     }
     return age.toString();
   }
-
   @override
   void initState() {
     // TODO: implement initState
+
+    readData_notifications();
     super.initState();
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      print("message recieved");
+      _msg_title = event.notification.title;
+      _msg_body = event.notification.body;
+      setState(() {
+        fill = true;
+      });
+      print(event.notification.body);
+      if(_selectedIndex != 1)
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(event.notification.title),
+              content: Text(event.notification.body),
+              actions: [
+                TextButton(
+                  child: Text("GO NOW"),
+                  onPressed: () {
+                    setState(() {
+                      _selectedIndex = 1;
+                    });
+                  },
+                )
+              ],
+            );
+          });
+    });
+
     readData();
     readData_posts();
     _date = DateTime.now();
@@ -408,12 +559,15 @@ class _Home_PageState extends State<Home_Page>
     }
     _user = _auth.currentUser;
   }
-
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
-    if(_changes_made)
-      readData_posts();
-
+    if (_changes_made) readData_posts();
+    if(fill) push_notifications();
     Size _size = MediaQuery.of(context).size;
     List _widgetOptions = [
       _home_show
@@ -445,14 +599,29 @@ class _Home_PageState extends State<Home_Page>
               ),
             )
           : Loading_Screen(),
-      Center(
-        child: Text('Charity',
-            style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-      ),
-      Center(
-        child: Text('Blood Donation',
-            style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-      ),
+      notifs ? Scaffold(
+        backgroundColor: Colors.white,
+        body: Padding(
+          padding: EdgeInsets.fromLTRB(10, _size.height * 0.08, 10, 0),
+          child: new ListView.builder(
+            itemCount: Notif_Cards.length,
+            itemBuilder: (BuildContext context, int index) {
+              final item = Notif_Cards[index];
+              return Dismissible(
+                  child: Notif_Cards.elementAt(index),
+                direction: DismissDirection.horizontal,
+                key: Key(item.toStringShort()),
+                onDismissed: (direction) {
+                  // Then show a snackbar.
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Notification dismissed')));
+                },
+
+              );
+            },
+          ),
+        ),
+      ): Loading_Screen(),
       _show
           ? WillPopScope(
               onWillPop: () async => false,
@@ -1013,16 +1182,6 @@ class _Home_PageState extends State<Home_Page>
                     height: _size.height * 0.02, color: Colors.blueAccent),
                 title: new Text(
                   'Home',
-                  style: TextStyle(color: Colors.blueAccent),
-                ),
-              ),
-              BottomNavigationBarItem(
-                icon: new Image.asset(
-                  'Images/charity.png',
-                  height: _size.height * 0.03,
-                ),
-                title: new Text(
-                  'Charity',
                   style: TextStyle(color: Colors.blueAccent),
                 ),
               ),

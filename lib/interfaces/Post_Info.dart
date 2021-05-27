@@ -289,13 +289,14 @@ class _Post_InfoState extends State<Post_Info> {
                                 databaseReference.child('Posts').child('Total Posts').update({
                                   'Total Posts': --_total_posts,
                                 });
+                                databaseReference
+                                    .child('Posts')
+                                    .child(widget._post['Hash'])
+                                    .remove().then((_){
+                                  Navigator.of(context).pop();
+                                });
                               });
-                              databaseReference
-                                  .child('Posts')
-                                  .child(widget._post['Hash'])
-                                  .remove();
 
-                              Navigator.of(context).pop();
                             },
                             child: Text('DELETE'),
                             style: ElevatedButton.styleFrom(
