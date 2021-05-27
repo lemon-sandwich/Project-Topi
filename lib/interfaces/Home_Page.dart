@@ -350,68 +350,84 @@ class _Home_PageState extends State<Home_Page>
     DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
     databaseReference.once().then((DataSnapshot snapshot) {
       // DATABASE USER INFORMATION
-      Map<dynamic, dynamic> values = snapshot.value['Notifications'];
-      if(values == null);
-      else
-      for (var key in values.values) {
-        notifications = {
-          'Title': key['Title'],
-          'Body': key['Body'],
-        };
-        all_notifications.add(notifications);
-        print(notifications);
-        Notif_Cards.add(
-            Card(
-                elevation: 7,
-                margin: EdgeInsets.only(bottom: 10),
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                color: Colors.grey[800],
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0,8,8,0),
-                      child: Row(
-                        children: [
-                          Image.asset('Images/ProjectTopi.png',height: MediaQuery.of(context).size.height*0.04,
-                            width: MediaQuery.of(context).size.width*0.04,),
-                          SizedBox(width: 10,),
-                          Text(
-                            '${notifications['Title']}',
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20,0,20,5),
-                      child: Text(
-                        notifications['Body'],
-                        overflow: TextOverflow.clip,
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 15,
-                          color: Colors.white,
+      Map<dynamic, dynamic> values = snapshot.value['DataBase'];
+      if (values != null)
+        for (var key in values.values) {
+          if (key['Email'] == _auth.currentUser.email) {
+            values = snapshot.value['DataBase'][key['Name']]['Notifications'];
+            break;
+          }
+        }
+          for (var key in values.values)
+          {
+            print(key);
+            notifications = {
+              'Title': key['Title'],
+              'Body': key['Body'],
+            };
+          all_notifications.add(notifications);
+          print(notifications);
+          Notif_Cards.add(Card(
+              elevation: 7,
+              margin: EdgeInsets.only(bottom: 10),
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              color: Colors.grey[800],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 0),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'Images/ProjectTopi.png',
+                          height: MediaQuery
+                              .of(context)
+                              .size
+                              .height * 0.04,
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width * 0.04,
                         ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          '${notifications['Title']}',
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 5),
+                    child: Text(
+                      notifications['Body'],
+                      overflow: TextOverflow.clip,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 15,
+                        color: Colors.white,
                       ),
                     ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                  ],
-                ))
-        );
-        _card_counter++;
-      }
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                ],
+              )));
+          _card_counter++;
+    }
       setState(() {
         notifs = true;
       });
@@ -422,14 +438,26 @@ class _Home_PageState extends State<Home_Page>
     setState(() {
       fill = false;
     });
-    DatabaseReference _ref =
-    FirebaseDatabase.instance.reference().child('Notifications');
-      _ref.push().set({
-        'Title': _msg_title,
-        'Body': _msg_body,
-      });
-      readData_notifications();
+
+    DatabaseReference _ref = FirebaseDatabase.instance.reference();
+    _ref.once().then((DataSnapshot snapshot) {
+      Map values = snapshot.value['DataBase'];
+      print("Keys: " + values.keys.toString());
+      for (int index = 0; index < values.keys.length; index++) {
+        print(values.keys.elementAt(index));
+        _ref = FirebaseDatabase.instance
+            .reference()
+            .child('DataBase')
+            .child(values.keys.elementAt(index))
+            .child('Notifications');
+        _ref.push().set({
+          'Title': _msg_title,
+          'Body': _msg_body,
+        });
+      }
+    });
   }
+
   int _selectedIndex = 0;
   void _onItemTapped(int index) {
     setState(() {
@@ -483,6 +511,7 @@ class _Home_PageState extends State<Home_Page>
     }
     return age.toString();
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -497,25 +526,25 @@ class _Home_PageState extends State<Home_Page>
         fill = true;
       });
       print(event.notification.body);
-      if(_selectedIndex != 1)
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(event.notification.title),
-              content: Text(event.notification.body),
-              actions: [
-                TextButton(
-                  child: Text("GO NOW"),
-                  onPressed: () {
-                    setState(() {
-                      _selectedIndex = 1;
-                    });
-                  },
-                )
-              ],
-            );
-          });
+      if (_selectedIndex != 1)
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(event.notification.title),
+                content: Text(event.notification.body),
+                actions: [
+                  TextButton(
+                    child: Text("GO NOW"),
+                    onPressed: () {
+                      setState(() {
+                        _selectedIndex = 1;
+                      });
+                    },
+                  )
+                ],
+              );
+            });
     });
 
     readData();
@@ -559,15 +588,17 @@ class _Home_PageState extends State<Home_Page>
     }
     _user = _auth.currentUser;
   }
+
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     if (_changes_made) readData_posts();
-    if(fill) push_notifications();
+    if (fill) push_notifications();
     Size _size = MediaQuery.of(context).size;
     List _widgetOptions = [
       _home_show
@@ -580,18 +611,20 @@ class _Home_PageState extends State<Home_Page>
                   itemBuilder: (BuildContext context, int index) {
                     return InkWell(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                type: PageTransitionType.fade,
-                                duration: Duration(milliseconds: 500),
-                                child: Post_Info(all_posts[index -
-                                    1]), // index - 1 because I added a SizedBox of height 0 as a starter of the List
-                              )).then((_) {
-                            setState(() {
-                              _changes_made = true;
+                          if (widget._admin) {
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.fade,
+                                  duration: Duration(milliseconds: 500),
+                                  child: Post_Info(all_posts[index -
+                                      1]), // index - 1 because I added a SizedBox of height 0 as a starter of the List
+                                )).then((_) {
+                              setState(() {
+                                _changes_made = true;
+                              });
                             });
-                          });
+                          }
                         },
                         child: Cards.elementAt(index));
                   },
@@ -599,29 +632,30 @@ class _Home_PageState extends State<Home_Page>
               ),
             )
           : Loading_Screen(),
-      notifs ? Scaffold(
-        backgroundColor: Colors.white,
-        body: Padding(
-          padding: EdgeInsets.fromLTRB(10, _size.height * 0.08, 10, 0),
-          child: new ListView.builder(
-            itemCount: Notif_Cards.length,
-            itemBuilder: (BuildContext context, int index) {
-              final item = Notif_Cards[index];
-              return Dismissible(
-                  child: Notif_Cards.elementAt(index),
-                direction: DismissDirection.horizontal,
-                key: Key(item.toStringShort()),
-                onDismissed: (direction) {
-                  // Then show a snackbar.
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('Notification dismissed')));
-                },
-
-              );
-            },
-          ),
-        ),
-      ): Loading_Screen(),
+      notifs
+          ? Scaffold(
+              backgroundColor: Colors.white,
+              body: Padding(
+                padding: EdgeInsets.fromLTRB(10, _size.height * 0.08, 10, 0),
+                child: new ListView.builder(
+                  itemCount: Notif_Cards.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final item = Notif_Cards[index];
+                    return Dismissible(
+                      child: Notif_Cards.elementAt(index),
+                      direction: DismissDirection.horizontal,
+                      key: Key(item.toStringShort()),
+                      onDismissed: (direction) {
+                        // Then show a snackbar.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Notification dismissed')));
+                      },
+                    );
+                  },
+                ),
+              ),
+            )
+          : Loading_Screen(),
       _show
           ? WillPopScope(
               onWillPop: () async => false,
@@ -1134,34 +1168,36 @@ class _Home_PageState extends State<Home_Page>
             child: FloatingActionButton(
               heroTag: "Add Post",
               onPressed: () async {
-                await Navigator.push(
-                    context,
-                    PageTransition(
-                      type: PageTransitionType.bottomToTop,
-                      duration: Duration(milliseconds: 500),
-                      child: Create_Post_v2(),
-                    )).then((_) {
-                  int counter = -1;
-                  databaseReference.once().then((DataSnapshot snapshot) {
-                    Map<dynamic, dynamic> values = snapshot.value['Posts'];
-                    for (var key in values.values) {
-                      counter++;
-                    }
-                  }).then((_) {
-                    if (_total_posts < counter)
-                      setState(() {
-                        posts_retrieved = false;
-                        _changes_made = true;
-                        _total_posts = counter;
+                if (widget._admin) {
+                  await Navigator.push(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.bottomToTop,
+                        duration: Duration(milliseconds: 500),
+                        child: Create_Post_v2(),
+                      )).then((_) {
+                    int counter = -1;
+                    databaseReference.once().then((DataSnapshot snapshot) {
+                      Map<dynamic, dynamic> values = snapshot.value['Posts'];
+                      for (var key in values.values) {
+                        counter++;
+                      }
+                    }).then((_) {
+                      if (_total_posts < counter)
+                        setState(() {
+                          posts_retrieved = false;
+                          _changes_made = true;
+                          _total_posts = counter;
+                        });
+                      databaseReference
+                          .child('Posts')
+                          .child('Total Posts')
+                          .update({
+                        'Total Posts': counter,
                       });
-                    databaseReference
-                        .child('Posts')
-                        .child('Total Posts')
-                        .update({
-                      'Total Posts': counter,
                     });
                   });
-                });
+                }
               },
               tooltip: 'Add',
               child: Image.asset(

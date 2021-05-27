@@ -16,10 +16,10 @@ class _VerifyEmailState extends State<VerifyEmail> {
   @override
   void initState() {
     // TODO: implement initState
-    _user = _auth.currentUser;
-    _user.sendEmailVerification();
-
     super.initState();
+    _user = _auth.currentUser;
+    print("User => " + _user.toString());
+    _user.sendEmailVerification();
   }
   @override
   Widget build(BuildContext context) {

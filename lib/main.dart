@@ -73,10 +73,20 @@ class _HomeState extends State<Home> {
     });
 
     DatabaseReference _ref =
-    FirebaseDatabase.instance.reference().child('Notifications');
-    _ref.push().set({
-      'Title': _msg_title,
-      'Body': _msg_body,
+    FirebaseDatabase.instance.reference();
+    _ref.once().then((DataSnapshot snapshot) {
+      Map values = snapshot.value['DataBase'];
+      print("Keys: " + values.keys.toString());
+      for(int index=0;index<values.keys.length;index++)
+        {
+          print(values.keys.elementAt(index));
+          _ref =
+          FirebaseDatabase.instance.reference().child('DataBase').child(values.keys.elementAt(index)).child('Notifications');
+          _ref.push().set({
+            'Title': _msg_title,
+            'Body': _msg_body,
+          });
+        }
     });
   }
   TextEditingController _email = TextEditingController();
