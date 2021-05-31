@@ -1,4 +1,6 @@
 //import 'dart:convert';
+import 'dart:async';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,16 +8,84 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/interfaces/Home_Page.dart';
 import 'package:flutter_app/interfaces/Forgot_Password.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'interfaces/NewScreen.dart';
 import 'interfaces/Signup_interface.dart';
 import 'services/facebooklogin.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+bool _fill = false;
+bool _pushed = false;
+bool filled() {
+  if(_pushed == true) {
+    return true;
+  } else return false;
+}
+void push_notifications(String title,String body) {
+  _fill = false;
+  print('Notification Pushed');
+  DatabaseReference _ref = FirebaseDatabase.instance.reference();
+  _ref.once().then((DataSnapshot snapshot) {
+    Map values = snapshot.value['DataBase'];
+    print("Keys: " + values.keys.toString());
+    for (int index = 0; index < values.keys.length; index++) {
+      _ref = FirebaseDatabase.instance
+          .reference()
+          .child('DataBase')
+          .child(values.keys.elementAt(index))
+          .child('Notifications');
+      _ref.push().set({
+        'Title': title,
+        'Body': body,
+      });
+    }
+  });
+  _pushed = true;
+  filled();
+  Timer.periodic(Duration(milliseconds: 50) , (timer) {
+    _pushed = false;
+    timer.cancel();
+  });
+}
+var initializationSettingsAndroid =
+AndroidInitializationSettings('@mipmap/ic_launcher');
+var initializationSettingsIOs = IOSInitializationSettings();
+var initSetttings = InitializationSettings(
+    android: initializationSettingsAndroid, iOS: initializationSettingsIOs);
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+showNotification(String title,String description) async {
+  var android = new AndroidNotificationDetails(
+      'id', 'channel ', 'description',
+      priority: Priority.high, importance: Importance.max);
+  var iOS = new IOSNotificationDetails();
+  var platform = new NotificationDetails(android: android, iOS: iOS);
+  await flutterLocalNotificationsPlugin.show(
+      0, title, description, platform,
+      payload: 'Welcome to the Local Notification demo ');
+}
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-
+  showNotification(message.notification.title, message.notification.body);
+  DatabaseReference _ref =
+  FirebaseDatabase.instance.reference();
+  _ref.once().then((DataSnapshot snapshot) {
+    Map values = snapshot.value['DataBase'];
+    print("Keys: " + values.keys.toString());
+    for(int index=0;index<values.keys.length;index++)
+    {
+      print(values.keys.elementAt(index));
+      _ref =
+          FirebaseDatabase.instance.reference().child('DataBase').child(values.keys.elementAt(index)).child('Notifications');
+      _ref.push().set({
+        'Title': message.notification.title,
+        'Body': message.notification.body,
+      });
+    }
+  });
   print("Handling a background message: ${message.messageId}");
 }
 void main() async {
@@ -42,22 +112,24 @@ void main() async {
 }
 
 class Home extends StatefulWidget {
-
   @override
   _HomeState createState() => _HomeState();
 
 }
 
 class _HomeState extends State<Home> {
+
+
+
   Future<void> Messaging() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     await FirebaseMessaging.instance.subscribeToTopic('BloodDonations');
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
-      announcement: false,
+      announcement: true,
       badge: true,
       carPlay: false,
-      criticalAlert: false,
+      criticalAlert: true,
       provisional: false,
       sound: true,
     );
@@ -67,82 +139,48 @@ class _HomeState extends State<Home> {
     );
     print('User granted permission: ${settings.authorizationStatus}');
   }
-  void push_notifications() {
-    setState(() {
-      fill = false;
-    });
 
-    DatabaseReference _ref =
-    FirebaseDatabase.instance.reference();
-    _ref.once().then((DataSnapshot snapshot) {
-      Map values = snapshot.value['DataBase'];
-      print("Keys: " + values.keys.toString());
-      for(int index=0;index<values.keys.length;index++)
-        {
-          print(values.keys.elementAt(index));
-          _ref =
-          FirebaseDatabase.instance.reference().child('DataBase').child(values.keys.elementAt(index)).child('Notifications');
-          _ref.push().set({
-            'Title': _msg_title,
-            'Body': _msg_body,
-          });
-        }
-    });
-  }
+
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
-  final _emailFill = GlobalKey<FormState>();
-  final _passwordFill = GlobalKey<FormState>();
+  final _email_fill = GlobalKey<FormState>();
+  final _password_fill = GlobalKey<FormState>();
   FirebaseAuth _auth = FirebaseAuth.instance;
   DatabaseReference _ref = FirebaseDatabase.instance.reference();
   Map _data;
   bool _obscureTextPass = true;
+  bool _inside = false;
   @override
   void _togglePass() {
     setState(() {
       _obscureTextPass = !_obscureTextPass;
     });
   }
-  bool fill = false;
   String _msg_title,_msg_body;
+
   @override
   void initState() {
     // TODO: implement initState
     Messaging();
-    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
-      print("message recieved");
-      _msg_title = event.notification.title;
-      _msg_body = event.notification.body;
-      setState(() {
-        fill = true;
-      });
-      print(event.notification.body);
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(event.notification.title),
-                content: Text(event.notification.body),
-                actions: [
-                  TextButton(
-                    child: Text("Check"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              );
-            });
-    });
+
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    if(fill) push_notifications();
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      showNotification(event.notification.title, event.notification.body);
+      print("message recieved");
+      _msg_title = event.notification.title;
+      _msg_body = event.notification.body;
+      setState(() {
+        _fill = true;
+        filled();
+      });
+      print("main():=> Description: " + event.notification.body);
+    });
+    if(_fill && !_inside) push_notifications(_msg_title,_msg_body);
     _ref.once().then((DataSnapshot snapshot) {
       _data = snapshot.value['DataBase'];
-      for(var key in _data.values)
-        print(key['Email']);
     });
     Size _size = MediaQuery.of(context).size;
     return Scaffold(
@@ -203,7 +241,7 @@ class _HomeState extends State<Home> {
                 child: Column(
                   children: <Widget>[
                     Form(
-                      key: _emailFill,
+                      key: _email_fill,
                       child: TextFormField(
                         validator: (value) {
                           bool found = false;
@@ -237,7 +275,7 @@ class _HomeState extends State<Home> {
                         Flexible(
                           flex: 10,
                           child: Form(
-                            key: _passwordFill,
+                            key: _password_fill,
                             child: TextFormField(
                               validator: (value) {
                                 bool found = false;
@@ -316,8 +354,8 @@ class _HomeState extends State<Home> {
                           elevation: 7,
                           child: InkWell(
                             onTap: () async {
-                              if (_emailFill.currentState.validate() &&
-                                  _passwordFill.currentState.validate()) {
+                              if (_email_fill.currentState.validate() &&
+                                  _password_fill.currentState.validate()) {
                                 dynamic result = await _auth
                                     .signInWithEmailAndPassword(
                                         email: _email.text,

@@ -1,11 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/interfaces/Loading_Screen.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class Create_Post_v2 extends StatefulWidget {
   @override
@@ -30,11 +32,20 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
   DatabaseReference _databaseReference;
   final _donation_ref = FirebaseDatabase.instance.reference();
   FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseStorage _storage = FirebaseStorage.instance;
   bool _show = false;
   List<String> _donation_types = ['Zakat', 'Fitrana', 'Sadqa', 'Other'];
   int counter;
   String result;
   bool done = false;
+  File _image;
+  Future pickImageFromGallery() async{
+      final image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      setState(() {
+        _image = image;
+      });
+  }
+
   void readData() {
     counter = 1;
     _donation_ref.once().then((DataSnapshot snapshot) {
@@ -81,10 +92,14 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
 
   @override
   Widget build(BuildContext context) {
+    Size _size = MediaQuery.of(context).size;
     return _show
         ? Scaffold(
             // resizeToAvoidBottomInset: false,
             appBar: AppBar(
+              iconTheme: IconThemeData(
+                color: Colors.transparent, //change your color here
+              ),
               backgroundColor: Colors.orange,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -198,9 +213,11 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: DropdownButton<String>(
+                    
                     isExpanded: true,
                     items: _donation_types.map((String dropDownItems) {
                       return DropdownMenuItem<String>(
+                        
                         value: dropDownItems,
                         child: Text(dropDownItems,
                             style: TextStyle(
@@ -253,6 +270,40 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
                     : SizedBox(
                         height: 0,
                       ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: pickImageFromGallery,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Image.asset('Images/paperclip.png',height: _size.height*0.04,width: _size.width*0.04,color: Colors.grey,),
+                        SizedBox(width: 10,),
+                        Text('ATTACH A FILE',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),),
+                      ],
+                    ),
+                  ),
+                ),
+                _image == null? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('No image selected',style: TextStyle(
+    fontFamily: 'Montserrat',
+    color: Colors.grey,
+    fontSize: 12,
+    ),),
+                ): Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('1 Image Selected',style: TextStyle(
+                    fontFamily: 'Montserrat',
+                    color: Colors.grey,
+                    fontSize: 12,
+                  ),),
+                ),
               ],
             ))
         : Loading_Screen();
@@ -283,13 +334,23 @@ class _Create_Post_v2State extends State<Create_Post_v2> {
       _donation_ref.child('Donations').push().set(d_types);
     } else
       donation_type = _donation_selected;
-
+    String url;
+    if(_image != null) {
+      Reference reference = _storage.ref().child("images/");
+      UploadTask uploadTask = reference.putFile(_image);
+      TaskSnapshot taskSnapshot = await uploadTask;
+      url = await taskSnapshot.ref.getDownloadURL();
+    }
+    else url = 'N/A';
     Map<String, String> info = {
       'Title': title,
       'Amount': amount,
       'Donation Type': donation_type,
       'Description': description,
+      'Image URL': url,
     };
     _databaseReference.push().set(info);
+
+
   }
 }

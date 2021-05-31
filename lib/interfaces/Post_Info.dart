@@ -6,9 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/interfaces/Loading_Screen.dart';
 import 'package:page_transition/page_transition.dart';
 
+import 'Donate.dart';
+
 class Post_Info extends StatefulWidget {
   Map _post;
-  Post_Info(this._post, {Key, key}) : super(key: key);
+  bool _admin;
+  Post_Info(this._post,this._admin, {Key, key}) : super(key: key);
   @override
   _Post_InfoState createState() => _Post_InfoState();
 }
@@ -76,13 +79,16 @@ class _Post_InfoState extends State<Post_Info> {
     Size _size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.transparent,
+        ),
         backgroundColor: Colors.orange,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(
               child: Text(
-                widget._post['Title'],
+                widget._post['Title'].toString().toUpperCase(),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 3,
                 style: TextStyle(
@@ -122,7 +128,7 @@ class _Post_InfoState extends State<Post_Info> {
         ),
       ),
       body: _show
-          ? Scaffold(
+          ? widget._admin ? Scaffold(
               backgroundColor: Colors.grey[100],
               // resizeToAvoidBottomInset: false,
 
@@ -306,7 +312,92 @@ class _Post_InfoState extends State<Post_Info> {
                     ],
                   )
                 ],
-              ))
+              )): Scaffold(
+        body: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  widget._post['Image URL'] != 'N/A'? Image.network(widget._post['Image URL']): SizedBox(height: 0,),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('DESCRIPTION',style: TextStyle(
+                      fontFamily: 'Lexend',
+                      letterSpacing: 2,
+                      fontSize: 30,
+                    ),),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(25,8,25,8),
+                    child: Text(
+                      widget._post['Description'],
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 10,
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('AMOUNT REQUIRED',style: TextStyle(
+                      fontFamily: 'Lexend',
+                      letterSpacing: 2,
+                      fontSize: 30,
+                    ),),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(25,8,25,8),
+                    child: Text(
+                      'Rs. ${widget._post['Amount']}/-',
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 10,
+
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        fontSize: 20,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+
+                  Container(
+                    height: 40,
+                    child: Material(
+                        borderRadius: BorderRadius.circular(20),
+                        shadowColor: Colors.orangeAccent,
+                        color: Colors.orange,
+                        elevation: 7,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.bottomToTop,
+                                  duration: Duration(milliseconds: 500),
+                                  child: Donate(),
+                                ));
+                          },
+                          child: Center(
+                              child: Text('DONATE',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 20,
+                                  ))),
+                        )),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      )
           : Loading_Screen(),
     );
   }
